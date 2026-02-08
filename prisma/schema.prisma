@@ -1,4 +1,4 @@
-// Prisma schema for ScoreSnap MVP
+// Prisma schema for ScoreSnap MVP + Supabase Integration
 // 5 models: User, Submission, Game, ValidationError, EditHistory
 
 generator client {
@@ -8,42 +8,56 @@ generator client {
 datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL") // Optional: for migrations
 }
 
-enum Role {
-  ADMIN
-  COACH
-}
+// ========================================
+// EXISTING SUPABASE MODELS (Reference Only)
+// ========================================
+// Uncomment when you need to work with schools directly
 
-enum SubmissionStatus {
-  DRAFT
-  PROCESSING
-  COMPLETED
-  FAILED
-}
+// model School {
+//   id              String    @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+//   key             String    @unique
+//   name            String
+//   city            String?
+//   classification  String?
+//   conference      String?
+//   createdAt       DateTime  @default(now()) @map("created_at")
+//   updatedAt       DateTime  @updatedAt @map("updated_at")
+//
+//   homeGames       Game[]    @relation("HomeTeam")
+//   awayGames       Game[]    @relation("AwayTeam")
+//
+//   @@map("schools")
+//   @@index([key])
+//   @@index([classification])
+//   @@index([conference])
+// }
 
 // ========================================
 // MODEL 1: User (Authentication)
 // ========================================
 model User {
-  id            String   @id @default(cuid())
+  id            String   @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
   email         String   @unique
-  passwordHash  String   // bcrypt hash
+  passwordHash  String   @map("password_hash")
   name          String
-  role          Role     @default(COACH)
+  role          String   @default("COACH") // 'ADMIN' or 'COACH'
 
-  // Coach-specific fields (denormalized for simplicity)
-  schoolName    String?  // e.g., "Greensboro Day School"
-  primarySport  String?  // e.g., "BASKETBALL"
-  verifiedAt    DateTime? // Admin approval timestamp
+  // Coach-specific fields
+  schoolName    String?  @map("school_name")
+  primarySport  String?  @map("primary_sport")
+  verifiedAt    DateTime? @map("verified_at")
 
   // Relations
   submissions   Submission[]
 
-  createdAt     DateTime @default(now())
-  updatedAt     DateTime @updatedAt
-  deletedAt     DateTime? // Soft delete
+  createdAt     DateTime  @default(now()) @map("created_at")
+  updatedAt     DateTime  @updatedAt @map("updated_at")
+  deletedAt     DateTime? @map("deleted_at")
 
+  @@map("users")
   @@index([email])
   @@index([role])
   @@index([schoolName])
@@ -54,27 +68,28 @@ model User {
 // MODEL 2: Submission (Upload Session)
 // ========================================
 model Submission {
-  id            String           @id @default(cuid())
-  userId        String
-  user          User             @relation(fields: [userId], references: [id], onDelete: Cascade)
+  id               String    @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  userId           String    @map("user_id") @db.Uuid
+  user             User      @relation(fields: [userId], references: [id], onDelete: Cascade)
 
-  sport         String           // "BASKETBALL", "FOOTBALL", etc.
-  status        SubmissionStatus @default(DRAFT)
+  sport            String    // "BASKETBALL", "FOOTBALL", etc.
+  status           String    @default("DRAFT") // 'DRAFT', 'PROCESSING', 'COMPLETED', 'FAILED'
 
   // Image storage (Sanity CDN URLs)
-  imageUrl      String           // Primary scorebook image URL from Sanity
-  imageAssetId  String?          // Sanity asset ID for reference
+  imageUrl         String    @map("image_url")
+  imageAssetId     String?   @map("image_asset_id")
 
   // AI extraction (full JSON response from Claude)
-  rawAiResponse Json?            // Store entire Claude response
-  processingTimeMs Int?          // How long extraction took
+  rawAiResponse    Json?     @map("raw_ai_response")
+  processingTimeMs Int?      @map("processing_time_ms")
 
   // Relations
-  game          Game?            // One submission → one game (when approved)
+  game             Game?
 
-  createdAt     DateTime @default(now())
-  updatedAt     DateTime @updatedAt
+  createdAt        DateTime  @default(now()) @map("created_at")
+  updatedAt        DateTime  @updatedAt @map("updated_at")
 
+  @@map("submissions")
   @@index([userId])
   @@index([status])
   @@index([sport])
@@ -82,48 +97,47 @@ model Submission {
 }
 
 // ========================================
-// MODEL 3: Game (Approved Game Data)
+// MODEL 3: Game (Approved Game Data - Maps to existing Supabase games table)
 // ========================================
 model Game {
-  id              String   @id @default(cuid())
-  submissionId    String   @unique
-  submission      Submission @relation(fields: [submissionId], references: [id], onDelete: Restrict)
+  id              String    @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
 
-  // Core game info
-  sport           String   // "BASKETBALL"
-  date            DateTime
+  // Existing Supabase fields
+  date            DateTime  @db.Date
+  sport           String
+  homeTeamId      String?   @map("home_team_id") @db.Uuid
+  awayTeamId      String?   @map("away_team_id") @db.Uuid
+  homeScore       Int?      @map("home_score")
+  awayScore       Int?      @map("away_score")
+  status          String?
+  source          String?
+  gender          String?
 
-  // Teams (denormalized as strings for MVP)
-  homeTeamName    String
-  awayTeamName    String
+  // ScoreSnap enhancement fields
+  submissionId    String?   @unique @map("submission_id") @db.Uuid
+  submission      Submission? @relation(fields: [submissionId], references: [id], onDelete: Restrict)
 
-  // Scores
-  homeScore       Int
-  awayScore       Int
-  quarterScores   Json?    // [[Q1_home, Q1_away], [Q2_home, Q2_away], ...]
-  overtime        Boolean  @default(false)
+  quarterScores   Json?     @map("quarter_scores") // [[Q1_home, Q1_away], ...]
+  overtime        Boolean   @default(false)
+  gameData        Json?     @map("game_data") // Complete player stats from AI
+  editableUntil   DateTime? @map("editable_until")
+  approvedBy      String?   @map("approved_by") @db.Uuid
 
-  // Full game data (player stats as JSON)
-  gameData        Json     // Complete structured data from AI extraction
+  // Relations
+  editHistory     EditHistory[]
 
-  // Edit window
-  editableUntil   DateTime // createdAt + 48 hours
+  createdAt       DateTime  @default(now()) @map("created_at")
+  updatedAt       DateTime  @updatedAt @map("updated_at")
+  deletedAt       DateTime? @map("deleted_at")
 
-  // Metadata
-  location        String?
-  approvedBy      String   // User ID who approved submission
-
-  createdAt       DateTime @default(now())
-  updatedAt       DateTime @updatedAt
-  deletedAt       DateTime? // Soft delete only
-
-  @@unique([homeTeamName, awayTeamName, date]) // Duplicate detection
+  @@map("games")
   @@index([sport])
   @@index([date])
-  @@index([sport, date]) // Scoreboard query: "Show all basketball games today"
-  @@index([homeTeamName])
-  @@index([awayTeamName])
-  @@index([editableUntil]) // Cleanup job: games past edit window
+  @@index([sport, date])
+  @@index([homeTeamId])
+  @@index([awayTeamId])
+  @@index([submissionId])
+  @@index([editableUntil])
   @@index([deletedAt])
 }
 
@@ -131,19 +145,20 @@ model Game {
 // MODEL 4: ValidationError (AI Quality Tracking)
 // ========================================
 model ValidationError {
-  id              String   @id @default(cuid())
-  submissionId    String
+  id              String    @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  submissionId    String    @map("submission_id") @db.Uuid
 
-  errorCode       String   // "POINTS_MISMATCH", "FOULS_EXCEED_MAX", etc.
-  errorMessage    String
-  fieldPath       String?  // e.g., "homeTeam.players[3].points"
+  errorCode       String    @map("error_code")
+  errorMessage    String    @map("error_message")
+  fieldPath       String?   @map("field_path")
 
   // Coach override
-  overridden      Boolean  @default(false)
-  overrideReason  String?
+  overridden      Boolean   @default(false)
+  overrideReason  String?   @map("override_reason")
 
-  createdAt       DateTime @default(now())
+  createdAt       DateTime  @default(now()) @map("created_at")
 
+  @@map("validation_errors")
   @@index([submissionId])
   @@index([errorCode])
   @@index([createdAt])
@@ -153,17 +168,19 @@ model ValidationError {
 // MODEL 5: EditHistory (Field-Level Changes)
 // ========================================
 model EditHistory {
-  id              String   @id @default(cuid())
-  gameId          String
+  id              String    @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  gameId          String    @map("game_id") @db.Uuid
+  game            Game      @relation(fields: [gameId], references: [id], onDelete: Cascade)
 
-  editedBy        String   // User ID
-  editedAt        DateTime @default(now())
+  editedBy        String    @map("edited_by") @db.Uuid
+  editedAt        DateTime  @default(now()) @map("edited_at")
 
-  fieldPath       String   // e.g., "homeTeam.players[0].points"
-  oldValue        String?
-  newValue        String?
+  fieldPath       String    @map("field_path")
+  oldValue        String?   @map("old_value")
+  newValue        String?   @map("new_value")
 
+  @@map("edit_history")
   @@index([gameId])
   @@index([editedAt])
-  @@index([fieldPath]) // Analytics: "Which fields are edited most?"
+  @@index([fieldPath])
 }

@@ -1,11 +1,12 @@
 import { SignJWT, jwtVerify } from 'jose';
 import { compare, hash } from 'bcrypt';
 import { prisma } from './prisma';
-import type { Role } from '@prisma/client';
 
 const JWT_SECRET = new TextEncoder().encode(
   process.env.JWT_SECRET || 'change-me-to-a-secure-random-string-in-production'
 );
+
+export type Role = 'ADMIN' | 'COACH';
 
 export interface JWTPayload {
   userId: string;
@@ -176,13 +177,13 @@ export function getTokenFromHeader(authHeader: string | null): string | null {
 /**
  * Verify admin role
  */
-export function isAdmin(user: { role: Role }): boolean {
+export function isAdmin(user: { role: string }): boolean {
   return user.role === 'ADMIN';
 }
 
 /**
  * Verify coach is verified
  */
-export function isVerifiedCoach(user: { role: Role; verifiedAt: Date | null }): boolean {
+export function isVerifiedCoach(user: { role: string; verifiedAt: Date | null }): boolean {
   return user.role === 'COACH' && user.verifiedAt !== null;
 }
