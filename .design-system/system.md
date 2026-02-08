@@ -2,7 +2,7 @@
 
 **Created**: 2026-02-07
 **Last Updated**: 2026-02-07
-**Direction**: Precision & Density (Sports Editorial Polish)
+**Direction**: Precision & Credibility (Sports Editorial Authority)
 
 ## Design Direction
 
@@ -38,12 +38,15 @@ Dense card grids, editorial two-column layouts, table-heavy (rankings/stats), mo
 ### Core Colors
 | Variable | Light | Dark | Usage |
 |----------|-------|------|-------|
-| `--background` | #ffffff | #1a1d29 | Page background |
+| `--background` | #fbfbfa | #272729 | Page background (slight warmth/cool) |
 | `--foreground` | #171717 | #fbfbfa | Primary text |
 | `--primary` | #94d873 | #94d873 | Brand accent, CTAs |
 | `--primary-dark` | #003d00 | #306332 | Primary text on primary bg |
-| `--secondary` | #64748b | #94a3b8 | Secondary text |
-| `--muted` | #94a3b8 | #64748b | Muted text, placeholders |
+| `--primary-light` | #e1f8d8 | #2d4a25 | Subtle green backgrounds |
+| `--secondary` | #212121 | #f0f0f0 | Secondary text |
+| `--muted` | #737373 | #a6a6a6 | Muted text, placeholders |
+| `--card` | #ffffff | #333333 | Card backgrounds (elevated) |
+| `--border` | #e6e6e6 | #404040 | Neutral borders |
 
 ### Sport-Specific Colors
 | Variable | Hex | Usage |
@@ -55,11 +58,26 @@ Dense card grids, editorial two-column layouts, table-heavy (rankings/stats), mo
 ### Semantic Colors
 | Variable | Light | Dark | Usage |
 |----------|-------|------|-------|
-| `--success` | #27AE60 | #4c7a4c | Success states, wins |
-| `--error` | #E74C3C | #ffb3b3 | Error states, losses |
-| `--navy-header` | #1a1d29 | #1a1d29 | Site header background |
-| `--card-bg` | #ffffff | #2d3748 | Card backgrounds |
-| `--border` | #e2e8f0 | #4a5568 | Borders, dividers |
+| `--success` | #83c961 | #4c7a4c | Success states, wins |
+| `--error` | #f7604c | #ffb3b3 | Error states, losses |
+| `--warning` | #f78535 | #f7c6a0 | Warning states |
+| `--info` | #4864d2 | #c2d4e6 | Info, links |
+| `--navy-header` | #1a1d29 | #212121 | Site header background |
+
+### Custom Brand Accents
+| Variable | Light | Dark | Usage |
+|----------|-------|------|-------|
+| `--cloud-gray` | #f1f0ee | #333333 | Soft backgrounds |
+| `--charcoal` | #212121 | #212121 | Brand dark accent |
+| `--meadow` | #94d873 | #94d873 | Brand green accent |
+| `--pearl` | #fbfbfa | #404040 | Brand light accent |
+
+### Tinted Card Backgrounds
+| Variable | Value | Usage |
+|----------|-------|-------|
+| `--card-mint` | #f5fdf2 (light) / #26332a (dark) | Green-tinted cards |
+| `--card-peach` | #fff5f0 (light) / #3d2e28 (dark) | Warm accent cards |
+| `--card-sky` | #f0f7ff (light) / #26303d (dark) | Blue-tinted cards |
 
 ### Spacing Scale
 Base: 4px grid

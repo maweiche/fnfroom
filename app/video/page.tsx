@@ -102,11 +102,12 @@ export default function VideoHubPage() {
         <div className="mb-6 flex flex-wrap gap-2 items-center">
           <span className="text-sm text-secondary">Active filters:</span>
           {sportFilter !== "all" && (
-            <SportTag
-              sport={sportFilter as Sport}
-              className="cursor-pointer"
-              onClick={() => setSportFilter("all")}
-            />
+            <button onClick={() => setSportFilter("all")}>
+              <SportTag
+                sport={sportFilter as Sport}
+                className="cursor-pointer hover:opacity-80 transition-opacity"
+              />
+            </button>
           )}
           {typeFilter !== "all" && (
             <span className="px-3 py-1 bg-muted/20 text-muted text-sm rounded-full cursor-pointer hover:bg-muted/30"
