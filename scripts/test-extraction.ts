@@ -56,18 +56,22 @@ async function main() {
       console.log(`🏠 ${result.game.homeTeam.name}: ${result.game.homeTeam.score}`);
       console.log(`   Players: ${result.game.homeTeam.players.length}`);
       result.game.homeTeam.players.forEach((p) => {
-        console.log(
-          `     #${p.number.padStart(2)} ${p.name.padEnd(25)} ${p.points} pts, ${p.fouls} fouls`
-        );
+        const number = (p.number || '?').toString().padStart(2);
+        const name = (p.name || 'Unknown').padEnd(25);
+        const points = p.points ?? '?';
+        const fouls = p.fouls ?? '?';
+        console.log(`     #${number} ${name} ${points} pts, ${fouls} fouls`);
       });
       console.log('');
 
       console.log(`✈️  ${result.game.awayTeam.name}: ${result.game.awayTeam.score}`);
       console.log(`   Players: ${result.game.awayTeam.players.length}`);
       result.game.awayTeam.players.forEach((p) => {
-        console.log(
-          `     #${p.number.padStart(2)} ${p.name.padEnd(25)} ${p.points} pts, ${p.fouls} fouls`
-        );
+        const number = (p.number || '?').toString().padStart(2);
+        const name = (p.name || 'Unknown').padEnd(25);
+        const points = p.points ?? '?';
+        const fouls = p.fouls ?? '?';
+        console.log(`     #${number} ${name} ${points} pts, ${fouls} fouls`);
       });
       console.log('');
 
