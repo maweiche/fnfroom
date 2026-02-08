@@ -1,5 +1,5 @@
 import { client } from "./client";
-import type { Article, StaffMember } from "@/lib/sanity.types";
+import type { Article, StaffMember, Rankings } from "@/lib/sanity.types";
 import {
   articlesQuery,
   latestArticlesQuery,
@@ -10,6 +10,10 @@ import {
   relatedArticlesQuery,
   staffMembersQuery,
   staffMemberBySlugQuery,
+  latestRankingsBySportQuery,
+  rankingsBySportQuery,
+  latestRankingsForSportQuery,
+  rankingsBySportAndSeasonQuery,
 } from "./queries";
 
 /**
@@ -103,5 +107,60 @@ export async function getStaffMemberBySlug(
     staffMemberBySlugQuery,
     { slug },
     { next: { revalidate: 3600 } }
+  );
+}
+
+/**
+ * Fetch latest rankings for all sports
+ */
+export async function getLatestRankingsBySport(): Promise<{
+  basketball: Rankings | null;
+  football: Rankings | null;
+  lacrosse: Rankings | null;
+}> {
+  return client.fetch(
+    latestRankingsBySportQuery,
+    {},
+    { next: { revalidate: 300 } }
+  );
+}
+
+/**
+ * Fetch all rankings for a specific sport
+ */
+export async function getRankingsBySport(
+  sport: "basketball" | "football" | "lacrosse"
+): Promise<Rankings[]> {
+  return client.fetch(
+    rankingsBySportQuery,
+    { sport },
+    { next: { revalidate: 300 } }
+  );
+}
+
+/**
+ * Fetch latest rankings for a specific sport
+ */
+export async function getLatestRankingsForSport(
+  sport: "basketball" | "football" | "lacrosse"
+): Promise<Rankings | null> {
+  return client.fetch(
+    latestRankingsForSportQuery,
+    { sport },
+    { next: { revalidate: 300 } }
+  );
+}
+
+/**
+ * Fetch rankings by sport and season
+ */
+export async function getRankingsBySportAndSeason(
+  sport: "basketball" | "football" | "lacrosse",
+  season: string
+): Promise<Rankings[]> {
+  return client.fetch(
+    rankingsBySportAndSeasonQuery,
+    { sport, season },
+    { next: { revalidate: 300 } }
   );
 }

@@ -173,3 +173,59 @@ export const staffMemberBySlugQuery = groq`
     socialLinks
   }
 `;
+
+/**
+ * Get latest rankings for each sport
+ */
+export const latestRankingsBySportQuery = groq`
+  {
+    "basketball": *[_type == "rankings" && sport == "basketball"] | order(publishDate desc) [0],
+    "football": *[_type == "rankings" && sport == "football"] | order(publishDate desc) [0],
+    "lacrosse": *[_type == "rankings" && sport == "lacrosse"] | order(publishDate desc) [0]
+  }
+`;
+
+/**
+ * Get all rankings for a specific sport
+ */
+export const rankingsBySportQuery = groq`
+  *[_type == "rankings" && sport == $sport] | order(publishDate desc) {
+    _id,
+    sport,
+    season,
+    week,
+    publishDate,
+    editorsNote,
+    entries
+  }
+`;
+
+/**
+ * Get latest rankings for a specific sport
+ */
+export const latestRankingsForSportQuery = groq`
+  *[_type == "rankings" && sport == $sport] | order(publishDate desc) [0] {
+    _id,
+    sport,
+    season,
+    week,
+    publishDate,
+    editorsNote,
+    entries
+  }
+`;
+
+/**
+ * Get rankings by sport and season
+ */
+export const rankingsBySportAndSeasonQuery = groq`
+  *[_type == "rankings" && sport == $sport && season == $season] | order(week desc) {
+    _id,
+    sport,
+    season,
+    week,
+    publishDate,
+    editorsNote,
+    entries
+  }
+`;

@@ -61,3 +61,25 @@ export interface Article {
   tags?: string[];
   seoDescription?: string;
 }
+
+export type RankingTrend = "up" | "down" | "steady" | "new";
+
+export interface RankingEntry {
+  rank: number;
+  team: string;
+  record: string;
+  conference?: string;
+  previousRank?: number;
+  trend?: RankingTrend;
+}
+
+export interface Rankings {
+  _id: string;
+  _type: "rankings";
+  sport: Sport;
+  season: string;
+  week: number;
+  publishDate: string;
+  editorsNote?: any[]; // Portable Text
+  entries: RankingEntry[];
+}
