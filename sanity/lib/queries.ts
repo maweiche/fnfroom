@@ -346,3 +346,86 @@ export const videoBySlugQuery = groq`
     featured
   }
 `;
+
+/**
+ * Get all players
+ */
+export const playersQuery = groq`
+  *[_type == "player"] | order(gradYear desc, name asc) {
+    _id,
+    name,
+    slug,
+    photo,
+    sport,
+    gradYear,
+    position,
+    school,
+    height,
+    weight,
+    featured
+  }
+`;
+
+/**
+ * Get featured players
+ */
+export const featuredPlayersQuery = groq`
+  *[_type == "player" && featured == true] | order(gradYear desc) [0...6] {
+    _id,
+    name,
+    slug,
+    photo,
+    sport,
+    gradYear,
+    position,
+    school,
+    height,
+    weight,
+    featured
+  }
+`;
+
+/**
+ * Get player by slug
+ */
+export const playerBySlugQuery = groq`
+  *[_type == "player" && slug.current == $slug][0] {
+    _id,
+    name,
+    slug,
+    photo,
+    sport,
+    gradYear,
+    position,
+    school,
+    height,
+    weight,
+    jerseyNumber,
+    bio,
+    highlightVideo->{
+      _id,
+      title,
+      slug,
+      video
+    },
+    stats,
+    offers,
+    socialLinks,
+    featured
+  }
+`;
+
+/**
+ * Get articles featuring a specific player
+ */
+export const articlesByPlayerQuery = groq`
+  *[_type == "article" && $playerName in playerTags] | order(publishDate desc) [0...5] {
+    _id,
+    title,
+    slug,
+    sport,
+    publishDate,
+    ${authorFragment},
+    ${imageFragment}
+  }
+`;

@@ -1,5 +1,5 @@
 import { client } from "./client";
-import type { Article, StaffMember, Rankings, Video } from "@/lib/sanity.types";
+import type { Article, StaffMember, Rankings, Video, Player } from "@/lib/sanity.types";
 import {
   articlesQuery,
   latestArticlesQuery,
@@ -19,6 +19,10 @@ import {
   featuredVideoQuery,
   videosBySportQuery,
   videoBySlugQuery,
+  playersQuery,
+  featuredPlayersQuery,
+  playerBySlugQuery,
+  articlesByPlayerQuery,
 } from "./queries";
 
 /**
@@ -213,4 +217,38 @@ export async function getVideosBySport(
  */
 export async function getVideoBySlug(slug: string): Promise<Video | null> {
   return client.fetch(videoBySlugQuery, { slug }, { cache: "no-store" });
+}
+
+/**
+ * Fetch all players
+ */
+export async function getPlayers(): Promise<Player[]> {
+  return client.fetch(playersQuery, {}, { next: { revalidate: 300 } });
+}
+
+/**
+ * Fetch featured players
+ */
+export async function getFeaturedPlayers(): Promise<Player[]> {
+  return client.fetch(featuredPlayersQuery, {}, { next: { revalidate: 300 } });
+}
+
+/**
+ * Fetch player by slug
+ */
+export async function getPlayerBySlug(slug: string): Promise<Player | null> {
+  return client.fetch(playerBySlugQuery, { slug }, { cache: "no-store" });
+}
+
+/**
+ * Fetch articles featuring a specific player
+ */
+export async function getArticlesByPlayer(
+  playerName: string
+): Promise<Article[]> {
+  return client.fetch(
+    articlesByPlayerQuery,
+    { playerName },
+    { next: { revalidate: 300 } }
+  );
 }

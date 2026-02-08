@@ -110,3 +110,50 @@ export interface Video {
   playerTags?: string[];
   featured: boolean;
 }
+
+export interface PlayerStats {
+  season: string;
+  statsData: {
+    // Basketball
+    ppg?: number;
+    rpg?: number;
+    apg?: number;
+    // Football
+    passingYards?: number;
+    rushingYards?: number;
+    touchdowns?: number;
+    // Lacrosse
+    goals?: number;
+    assists?: number;
+    groundBalls?: number;
+  };
+}
+
+export interface Player {
+  _id: string;
+  _type: "player";
+  name: string;
+  slug: {
+    current: string;
+  };
+  photo?: Image & {
+    alt?: string;
+  };
+  sport: Sport;
+  gradYear: number;
+  position: string;
+  school: string;
+  height?: string;
+  weight?: string;
+  jerseyNumber?: string;
+  bio?: any[]; // Portable Text
+  highlightVideo?: Video;
+  stats?: PlayerStats[];
+  offers?: string[];
+  socialLinks?: {
+    twitter?: string;
+    instagram?: string;
+    hudl?: string;
+  };
+  featured: boolean;
+}
