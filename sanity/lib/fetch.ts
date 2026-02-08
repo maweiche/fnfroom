@@ -1,5 +1,5 @@
 import { client } from "./client";
-import type { Article, StaffMember, Rankings } from "@/lib/sanity.types";
+import type { Article, StaffMember, Rankings, Video } from "@/lib/sanity.types";
 import {
   articlesQuery,
   latestArticlesQuery,
@@ -14,6 +14,11 @@ import {
   rankingsBySportQuery,
   latestRankingsForSportQuery,
   rankingsBySportAndSeasonQuery,
+  videosQuery,
+  latestVideosQuery,
+  featuredVideoQuery,
+  videosBySportQuery,
+  videoBySlugQuery,
 } from "./queries";
 
 /**
@@ -163,4 +168,49 @@ export async function getRankingsBySportAndSeason(
     { sport, season },
     { next: { revalidate: 300 } }
   );
+}
+
+/**
+ * Fetch all videos
+ */
+export async function getVideos(): Promise<Video[]> {
+  return client.fetch(videosQuery, {}, { next: { revalidate: 60 } });
+}
+
+/**
+ * Fetch latest N videos
+ */
+export async function getLatestVideos(limit: number = 6): Promise<Video[]> {
+  return client.fetch(
+    latestVideosQuery(limit),
+    {},
+    { next: { revalidate: 60 } }
+  );
+}
+
+/**
+ * Fetch featured video
+ */
+export async function getFeaturedVideo(): Promise<Video | null> {
+  return client.fetch(featuredVideoQuery, {}, { next: { revalidate: 60 } });
+}
+
+/**
+ * Fetch videos by sport
+ */
+export async function getVideosBySport(
+  sport: "basketball" | "football" | "lacrosse"
+): Promise<Video[]> {
+  return client.fetch(
+    videosBySportQuery,
+    { sport },
+    { next: { revalidate: 60 } }
+  );
+}
+
+/**
+ * Fetch video by slug
+ */
+export async function getVideoBySlug(slug: string): Promise<Video | null> {
+  return client.fetch(videoBySlugQuery, { slug }, { cache: "no-store" });
 }

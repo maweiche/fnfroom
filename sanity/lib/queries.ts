@@ -229,3 +229,120 @@ export const rankingsBySportAndSeasonQuery = groq`
     entries
   }
 `;
+
+/**
+ * Get all videos
+ */
+export const videosQuery = groq`
+  *[_type == "video"] | order(publishDate desc) {
+    _id,
+    title,
+    slug,
+    video,
+    sport,
+    type,
+    contributor->{
+      _id,
+      name,
+      slug
+    },
+    publishDate,
+    description,
+    playerTags,
+    featured
+  }
+`;
+
+/**
+ * Get latest N videos
+ */
+export const latestVideosQuery = (limit: number = 6) => groq`
+  *[_type == "video"] | order(publishDate desc) [0...${limit}] {
+    _id,
+    title,
+    slug,
+    video,
+    sport,
+    type,
+    contributor->{
+      _id,
+      name,
+      slug
+    },
+    publishDate,
+    description,
+    playerTags,
+    featured
+  }
+`;
+
+/**
+ * Get featured video
+ */
+export const featuredVideoQuery = groq`
+  *[_type == "video" && featured == true] | order(publishDate desc) [0] {
+    _id,
+    title,
+    slug,
+    video,
+    sport,
+    type,
+    contributor->{
+      _id,
+      name,
+      slug
+    },
+    publishDate,
+    description,
+    playerTags,
+    featured
+  }
+`;
+
+/**
+ * Get videos by sport
+ */
+export const videosBySportQuery = groq`
+  *[_type == "video" && sport == $sport] | order(publishDate desc) {
+    _id,
+    title,
+    slug,
+    video,
+    sport,
+    type,
+    contributor->{
+      _id,
+      name,
+      slug
+    },
+    publishDate,
+    description,
+    playerTags,
+    featured
+  }
+`;
+
+/**
+ * Get video by slug
+ */
+export const videoBySlugQuery = groq`
+  *[_type == "video" && slug.current == $slug][0] {
+    _id,
+    title,
+    slug,
+    video,
+    sport,
+    type,
+    contributor->{
+      _id,
+      name,
+      slug,
+      role,
+      photo
+    },
+    publishDate,
+    description,
+    playerTags,
+    featured
+  }
+`;

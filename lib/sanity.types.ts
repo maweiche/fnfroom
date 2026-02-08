@@ -83,3 +83,30 @@ export interface Rankings {
   editorsNote?: any[]; // Portable Text
   entries: RankingEntry[];
 }
+
+export type VideoType = "highlights" | "game-film" | "interview" | "feature";
+
+export interface MuxVideo {
+  asset?: {
+    playbackId?: string;
+    thumbTime?: number;
+    status?: string;
+  };
+}
+
+export interface Video {
+  _id: string;
+  _type: "video";
+  title: string;
+  slug: {
+    current: string;
+  };
+  video?: MuxVideo;
+  sport: Sport;
+  type: VideoType;
+  contributor?: StaffMember;
+  publishDate: string;
+  description?: string;
+  playerTags?: string[];
+  featured: boolean;
+}
