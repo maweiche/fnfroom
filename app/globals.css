@@ -1,0 +1,141 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    /* Core colors - Light mode */
+    --background: 0 0% 100%; /* #ffffff */
+    --foreground: 0 0% 9%; /* #171717 */
+
+    /* Primary brand colors */
+    --primary: 103 57% 65%; /* #94d873 */
+    --primary-dark: 120 100% 12%; /* #003d00 */
+    --primary-foreground: 120 100% 12%;
+
+    /* Secondary colors */
+    --secondary: 215 16% 47%; /* #64748b */
+    --secondary-foreground: 0 0% 100%;
+
+    /* Muted colors */
+    --muted: 215 16% 65%; /* #94a3b8 */
+    --muted-foreground: 215 16% 47%;
+
+    /* Accent (same as primary) */
+    --accent: 103 57% 65%;
+    --accent-foreground: 120 100% 12%;
+
+    /* Card */
+    --card: 0 0% 100%; /* #ffffff */
+    --card-foreground: 0 0% 9%;
+
+    /* Border */
+    --border: 214 32% 91%; /* #e2e8f0 */
+    --input: 214 32% 91%;
+    --ring: 103 57% 65%;
+
+    /* Sport-specific colors */
+    --basketball: 27 81% 51%; /* #E67E22 */
+    --football: 145 63% 42%; /* #27AE60 */
+    --lacrosse: 207 70% 45%; /* #2980B9 */
+
+    /* Semantic colors */
+    --success: 145 63% 42%; /* #27AE60 */
+    --error: 4 71% 58%; /* #E74C3C */
+
+    /* Navy header */
+    --navy-header: 225 20% 14%; /* #1a1d29 */
+
+    /* Border radius */
+    --radius: 0.5rem; /* 8px */
+  }
+
+  .dark {
+    /* Core colors - Dark mode */
+    --background: 225 20% 14%; /* #1a1d29 */
+    --foreground: 0 0% 98%; /* #fbfbfa */
+
+    /* Primary brand colors */
+    --primary: 103 57% 65%; /* #94d873 */
+    --primary-dark: 134 32% 29%; /* #306332 */
+    --primary-foreground: 134 32% 29%;
+
+    /* Secondary colors */
+    --secondary: 215 16% 65%; /* #94a3b8 */
+    --secondary-foreground: 0 0% 100%;
+
+    /* Muted colors */
+    --muted: 215 16% 47%; /* #64748b */
+    --muted-foreground: 215 16% 65%;
+
+    /* Accent */
+    --accent: 103 57% 65%;
+    --accent-foreground: 134 32% 29%;
+
+    /* Card */
+    --card: 214 24% 26%; /* #2d3748 */
+    --card-foreground: 0 0% 98%;
+
+    /* Border */
+    --border: 215 14% 34%; /* #4a5568 */
+    --input: 215 14% 34%;
+    --ring: 103 57% 65%;
+
+    /* Sport-specific colors - same in dark */
+    --basketball: 27 81% 51%;
+    --football: 145 63% 42%;
+    --lacrosse: 207 70% 45%;
+
+    /* Semantic colors */
+    --success: 140 50% 40%; /* #4c7a4c */
+    --error: 0 80% 85%; /* #ffb3b3 */
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+
+  body {
+    @apply bg-background text-foreground;
+    font-feature-settings: "rlig" 1, "calt" 1;
+  }
+
+  /* Typography defaults */
+  h1, h2, h3, h4, h5, h6 {
+    @apply font-semibold;
+  }
+
+  /* Tabular numerals for data */
+  .tabular-nums {
+    font-variant-numeric: tabular-nums;
+  }
+}
+
+@layer utilities {
+  /* Sport tag colors */
+  .sport-tag-basketball {
+    @apply bg-basketball text-white;
+  }
+
+  .sport-tag-football {
+    @apply bg-football text-white;
+  }
+
+  .sport-tag-lacrosse {
+    @apply bg-lacrosse text-white;
+  }
+
+  /* Shadow utilities matching design system */
+  .shadow-card {
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+  }
+
+  .shadow-card-hover {
+    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+  }
+}
+
+/* Google Fonts - Inter and JetBrains Mono */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap');
