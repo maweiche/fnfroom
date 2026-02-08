@@ -74,6 +74,22 @@ export const featuredArticleQuery = groq`
 `;
 
 /**
+ * Get featured article for a specific sport
+ */
+export const featuredArticleBySportQuery = groq`
+  *[_type == "article" && sport == $sport && featured == true] | order(publishDate desc) [0] {
+    _id,
+    title,
+    slug,
+    sport,
+    publishDate,
+    ${authorFragment},
+    ${imageFragment},
+    excerpt
+  }
+`;
+
+/**
  * Get single article by slug
  */
 export const articleBySlugQuery = groq`

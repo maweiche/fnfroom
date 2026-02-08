@@ -4,6 +4,7 @@ import {
   articlesQuery,
   latestArticlesQuery,
   featuredArticleQuery,
+  featuredArticleBySportQuery,
   articleBySlugQuery,
   articlesBySportQuery,
   relatedArticlesQuery,
@@ -34,6 +35,19 @@ export async function getLatestArticles(limit: number = 6): Promise<Article[]> {
  */
 export async function getFeaturedArticle(): Promise<Article | null> {
   return client.fetch(featuredArticleQuery, {}, { next: { revalidate: 60 } });
+}
+
+/**
+ * Fetch featured article for a specific sport
+ */
+export async function getFeaturedArticleBySport(
+  sport: "basketball" | "football" | "lacrosse"
+): Promise<Article | null> {
+  return client.fetch(
+    featuredArticleBySportQuery,
+    { sport },
+    { next: { revalidate: 60 } }
+  );
 }
 
 /**
