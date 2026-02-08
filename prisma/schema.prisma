@@ -1,0 +1,169 @@
+// Prisma schema for ScoreSnap MVP
+// 5 models: User, Submission, Game, ValidationError, EditHistory
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum Role {
+  ADMIN
+  COACH
+}
+
+enum SubmissionStatus {
+  DRAFT
+  PROCESSING
+  COMPLETED
+  FAILED
+}
+
+// ========================================
+// MODEL 1: User (Authentication)
+// ========================================
+model User {
+  id            String   @id @default(cuid())
+  email         String   @unique
+  passwordHash  String   // bcrypt hash
+  name          String
+  role          Role     @default(COACH)
+
+  // Coach-specific fields (denormalized for simplicity)
+  schoolName    String?  // e.g., "Greensboro Day School"
+  primarySport  String?  // e.g., "BASKETBALL"
+  verifiedAt    DateTime? // Admin approval timestamp
+
+  // Relations
+  submissions   Submission[]
+
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+  deletedAt     DateTime? // Soft delete
+
+  @@index([email])
+  @@index([role])
+  @@index([schoolName])
+  @@index([verifiedAt])
+}
+
+// ========================================
+// MODEL 2: Submission (Upload Session)
+// ========================================
+model Submission {
+  id            String           @id @default(cuid())
+  userId        String
+  user          User             @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  sport         String           // "BASKETBALL", "FOOTBALL", etc.
+  status        SubmissionStatus @default(DRAFT)
+
+  // Image storage (Sanity CDN URLs)
+  imageUrl      String           // Primary scorebook image URL from Sanity
+  imageAssetId  String?          // Sanity asset ID for reference
+
+  // AI extraction (full JSON response from Claude)
+  rawAiResponse Json?            // Store entire Claude response
+  processingTimeMs Int?          // How long extraction took
+
+  // Relations
+  game          Game?            // One submission → one game (when approved)
+
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  @@index([userId])
+  @@index([status])
+  @@index([sport])
+  @@index([createdAt])
+}
+
+// ========================================
+// MODEL 3: Game (Approved Game Data)
+// ========================================
+model Game {
+  id              String   @id @default(cuid())
+  submissionId    String   @unique
+  submission      Submission @relation(fields: [submissionId], references: [id], onDelete: Restrict)
+
+  // Core game info
+  sport           String   // "BASKETBALL"
+  date            DateTime
+
+  // Teams (denormalized as strings for MVP)
+  homeTeamName    String
+  awayTeamName    String
+
+  // Scores
+  homeScore       Int
+  awayScore       Int
+  quarterScores   Json?    // [[Q1_home, Q1_away], [Q2_home, Q2_away], ...]
+  overtime        Boolean  @default(false)
+
+  // Full game data (player stats as JSON)
+  gameData        Json     // Complete structured data from AI extraction
+
+  // Edit window
+  editableUntil   DateTime // createdAt + 48 hours
+
+  // Metadata
+  location        String?
+  approvedBy      String   // User ID who approved submission
+
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+  deletedAt       DateTime? // Soft delete only
+
+  @@unique([homeTeamName, awayTeamName, date]) // Duplicate detection
+  @@index([sport])
+  @@index([date])
+  @@index([sport, date]) // Scoreboard query: "Show all basketball games today"
+  @@index([homeTeamName])
+  @@index([awayTeamName])
+  @@index([editableUntil]) // Cleanup job: games past edit window
+  @@index([deletedAt])
+}
+
+// ========================================
+// MODEL 4: ValidationError (AI Quality Tracking)
+// ========================================
+model ValidationError {
+  id              String   @id @default(cuid())
+  submissionId    String
+
+  errorCode       String   // "POINTS_MISMATCH", "FOULS_EXCEED_MAX", etc.
+  errorMessage    String
+  fieldPath       String?  // e.g., "homeTeam.players[3].points"
+
+  // Coach override
+  overridden      Boolean  @default(false)
+  overrideReason  String?
+
+  createdAt       DateTime @default(now())
+
+  @@index([submissionId])
+  @@index([errorCode])
+  @@index([createdAt])
+}
+
+// ========================================
+// MODEL 5: EditHistory (Field-Level Changes)
+// ========================================
+model EditHistory {
+  id              String   @id @default(cuid())
+  gameId          String
+
+  editedBy        String   // User ID
+  editedAt        DateTime @default(now())
+
+  fieldPath       String   // e.g., "homeTeam.players[0].points"
+  oldValue        String?
+  newValue        String?
+
+  @@index([gameId])
+  @@index([editedAt])
+  @@index([fieldPath]) // Analytics: "Which fields are edited most?"
+}
