@@ -30,7 +30,7 @@ async function main() {
       password: TEMP_PASSWORD,
       name,
       role: 'COACH',
-      schoolName: schoolName || null,
+      schoolName: schoolName || undefined,
       primarySport: 'BASKETBALL',
     });
 

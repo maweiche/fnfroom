@@ -31,7 +31,7 @@ export async function generateToken(payload: JWTPayload): Promise<string> {
 export async function verifyToken(token: string): Promise<JWTPayload | null> {
   try {
     const { payload } = await jwtVerify(token, JWT_SECRET);
-    return payload as JWTPayload;
+    return payload as unknown as JWTPayload;
   } catch (error) {
     return null;
   }
@@ -125,7 +125,7 @@ export async function authenticateUser(email: string, password: string) {
   const token = await generateToken({
     userId: user.id,
     email: user.email,
-    role: user.role,
+    role: user.role as Role,
   });
 
   return {
@@ -134,7 +134,7 @@ export async function authenticateUser(email: string, password: string) {
       id: user.id,
       email: user.email,
       name: user.name,
-      role: user.role,
+      role: user.role as Role,
     },
   };
 }
@@ -158,6 +158,7 @@ export async function getUserFromToken(token: string) {
       schoolName: true,
       primarySport: true,
       verifiedAt: true,
+      writerStyleNotes: true, // For Press Box AI
     },
   });
 

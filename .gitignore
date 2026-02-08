@@ -23,9 +23,18 @@ report.[0-9]_.[0-9]_.[0-9]_.[0-9]_.json
 .env.test.local
 .env.production.local
 .env.local
+.env.local.tmp
 
 # Keep example file
 !.env.local.example
+
+# Documentation files (not for version control)
+PRESS_BOX_AI_TECH_STACK_DOCUMENTATION.md
+Pressbox_AI_PRD.md
+docs/press-box-ai-migration.md
+docs/pressbox-ai-frontend-guide.md
+plans/feat-press-box-ai-simplified-mvp.md
+plans/feat-press-box-ai-voice-to-article-platform.md
 
 # caches
 .eslintcache

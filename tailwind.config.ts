@@ -64,9 +64,9 @@ const config: Config = {
         sm: "calc(var(--radius) - 4px)",
       },
       fontFamily: {
-        sans: ["Inter", "system-ui", "sans-serif"],
-        display: ["Inter", "system-ui", "sans-serif"], // Headlines - will update to distinctive font
-        mono: ["JetBrains Mono", "Courier New", "monospace"],
+        sans: ["var(--font-inter)", "system-ui", "sans-serif"],
+        display: ["var(--font-space-grotesk)", "system-ui", "sans-serif"], // Athletic, bold headlines
+        mono: ["var(--font-jetbrains-mono)", "Courier New", "monospace"],
       },
       spacing: {
         xs: "4px",
@@ -100,6 +100,7 @@ const config: Config = {
         "fade-in": "fadeIn 0.2s ease-in-out",
         "slide-up": "slideUp 0.3s ease-out",
         "scale-in": "scaleIn 0.15s ease-out",
+        "marquee": "marquee 40s linear infinite",
       },
       keyframes: {
         fadeIn: {
@@ -113,6 +114,10 @@ const config: Config = {
         scaleIn: {
           "0%": { opacity: "0", transform: "scale(0.95)" },
           "100%": { opacity: "1", transform: "scale(1)" },
+        },
+        marquee: {
+          "0%": { transform: "translateX(0)" },
+          "100%": { transform: "translateX(-50%)" },
         },
       },
     },

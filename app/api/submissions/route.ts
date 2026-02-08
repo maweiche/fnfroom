@@ -85,7 +85,7 @@ export async function POST(request: NextRequest) {
       });
     }
 
-    return NextResponse.json({
+    const response = {
       submission: {
         id: submission.id,
         sport: submission.sport,
@@ -94,7 +94,11 @@ export async function POST(request: NextRequest) {
         createdAt: submission.createdAt,
         user: submission.user,
       },
-    });
+    };
+
+    console.log('Returning submission response:', response);
+
+    return NextResponse.json(response);
   } catch (error) {
     console.error('Submission creation error:', error);
     return NextResponse.json(

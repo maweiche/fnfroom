@@ -67,10 +67,15 @@ function ScoreSnapUpload() {
         throw new Error(data.error || 'Upload failed');
       }
 
-      const { submission } = await response.json();
+      const data = await response.json();
+      console.log('Submission response:', data);
+
+      if (!data.submission || !data.submission.id) {
+        throw new Error('Invalid response: missing submission ID');
+      }
 
       // Redirect to confirmation page
-      router.push(`/scoresnap/${submission.id}`);
+      router.push(`/scoresnap/${data.submission.id}`);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Upload failed');
       setUploading(false);

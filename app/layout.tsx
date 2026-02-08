@@ -3,7 +3,8 @@ import { Inter, JetBrains_Mono, Space_Grotesk } from "next/font/google";
 import "./globals.css";
 import { Footer } from "@/components/footer";
 import { AuthProvider } from "@/lib/auth-context";
-
+import { Navigation } from "@/components/navigation";
+import { CTAMarquee } from "@/components/cta-marquee";
 const inter = Inter({
   subsets: ["latin"],
   variable: "--font-inter",
@@ -61,6 +62,8 @@ export default function RootLayout({
       </head>
       <body className="font-sans antialiased">
         <AuthProvider>
+        <CTAMarquee />  
+        <Navigation />
           <main className="min-h-screen">{children}</main>
           <Footer />
         </AuthProvider>

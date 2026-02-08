@@ -1,5 +1,5 @@
-// Prisma schema for ScoreSnap MVP + Supabase Integration
-// 5 models: User, Submission, Game, ValidationError, EditHistory
+// Prisma schema for ScoreSnap MVP + Press Box AI + Supabase Integration
+// 7 models: User, Submission, Game, ValidationError, EditHistory, Conversation, Article
 
 generator client {
   provider = "prisma-client-js"
@@ -8,7 +8,7 @@ generator client {
 datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
-  directUrl = env("DIRECT_URL") // Optional: for migrations
+  // directUrl removed - was causing env loading issues with bunx
 }
 
 // ========================================
@@ -43,15 +43,20 @@ model User {
   email         String   @unique
   passwordHash  String   @map("password_hash")
   name          String
-  role          String   @default("COACH") // 'ADMIN' or 'COACH'
+  role          String   @default("COACH") // 'ADMIN', 'COACH', or 'WRITER'
 
   // Coach-specific fields
   schoolName    String?  @map("school_name")
   primarySport  String?  @map("primary_sport")
   verifiedAt    DateTime? @map("verified_at")
 
+  // Press Box AI fields (for writers)
+  writerStyleNotes String? @map("writer_style_notes") @db.Text
+
   // Relations
   submissions   Submission[]
+  conversations Conversation[] // Press Box AI
+  articles      Article[]      // Press Box AI
 
   createdAt     DateTime  @default(now()) @map("created_at")
   updatedAt     DateTime  @updatedAt @map("updated_at")
@@ -183,4 +188,69 @@ model EditHistory {
   @@index([gameId])
   @@index([editedAt])
   @@index([fieldPath])
+}
+
+// ========================================
+// PRESS BOX AI MODELS
+// ========================================
+
+// ========================================
+// MODEL 6: Conversation (Voice Interview Session)
+// ========================================
+model Conversation {
+  id           String   @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  userId       String   @map("user_id") @db.Uuid
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  sport        String   @default("football") // football, basketball, soccer, etc.
+
+  // Game info (proper columns for queryability)
+  homeTeam     String   @map("home_team")
+  awayTeam     String   @map("away_team")
+  homeScore    Int?     @map("home_score")
+  awayScore    Int?     @map("away_score")
+  gameDate     DateTime @map("game_date")
+  location     String?
+
+  // Transcript (JSON only because it's truly variable-length array)
+  // Format: [{role: "user"|"assistant", content: string, timestamp: string}]
+  transcript   Json
+
+  completed    Boolean  @default(false)
+
+  createdAt    DateTime @default(now()) @map("created_at")
+
+  // Relations
+  articles     Article[]
+
+  @@map("conversations")
+  @@index([userId, createdAt])
+  @@index([completed])
+  @@index([sport, gameDate])
+}
+
+// ========================================
+// MODEL 7: Article (Generated Article Draft)
+// ========================================
+model Article {
+  id             String    @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  conversationId String    @map("conversation_id") @db.Uuid
+  conversation   Conversation @relation(fields: [conversationId], references: [id], onDelete: Cascade)
+
+  userId         String    @map("user_id") @db.Uuid
+  user           User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  headline       String
+  bodyMarkdown   String    @map("body_markdown") @db.Text
+
+  published      Boolean   @default(false)
+  editCount      Int       @default(0) @map("edit_count")
+
+  createdAt      DateTime  @default(now()) @map("created_at")
+  publishedAt    DateTime? @map("published_at")
+
+  @@map("articles")
+  @@index([userId, createdAt])
+  @@index([conversationId])
+  @@index([published])
 }

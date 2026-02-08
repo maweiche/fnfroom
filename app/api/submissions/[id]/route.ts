@@ -8,9 +8,12 @@ import { getUserFromToken, getTokenFromHeader } from '@/lib/auth';
  */
 export async function GET(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    // In Next.js 15+, params is a Promise
+    const { id } = await params;
+
     // Authenticate user
     const token = getTokenFromHeader(request.headers.get('authorization'));
     if (!token) {
@@ -24,7 +27,7 @@ export async function GET(
 
     // Get submission with validation errors
     const submission = await prisma.submission.findUnique({
-      where: { id: params.id },
+      where: { id },
       include: {
         user: {
           select: {
@@ -51,7 +54,7 @@ export async function GET(
 
     // Get validation errors
     const validationErrors = await prisma.validationError.findMany({
-      where: { submissionId: params.id },
+      where: { submissionId: id },
       orderBy: { createdAt: 'asc' },
     });
 
@@ -94,9 +97,12 @@ export async function GET(
  */
 export async function PATCH(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    // In Next.js 15+, params is a Promise
+    const { id } = await params;
+
     // Authenticate user
     const token = getTokenFromHeader(request.headers.get('authorization'));
     if (!token) {
@@ -110,7 +116,7 @@ export async function PATCH(
 
     // Get submission
     const submission = await prisma.submission.findUnique({
-      where: { id: params.id },
+      where: { id },
     });
 
     if (!submission) {
@@ -137,7 +143,7 @@ export async function PATCH(
 
     // Update submission
     const updated = await prisma.submission.update({
-      where: { id: params.id },
+      where: { id },
       data: {
         rawAiResponse: gameData as any,
       },
@@ -165,9 +171,12 @@ export async function PATCH(
  */
 export async function DELETE(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    // In Next.js 15+, params is a Promise
+    const { id } = await params;
+
     // Authenticate user
     const token = getTokenFromHeader(request.headers.get('authorization'));
     if (!token) {
@@ -181,7 +190,7 @@ export async function DELETE(
 
     // Get submission
     const submission = await prisma.submission.findUnique({
-      where: { id: params.id },
+      where: { id },
     });
 
     if (!submission) {
@@ -198,7 +207,7 @@ export async function DELETE(
 
     // Delete submission (cascade will delete validation errors)
     await prisma.submission.delete({
-      where: { id: params.id },
+      where: { id },
     });
 
     return NextResponse.json({ success: true });

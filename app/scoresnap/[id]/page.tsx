@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { useRouter } from 'next/navigation';
+import { useRouter, useParams } from 'next/navigation';
 import Image from 'next/image';
 import { useAuth, ProtectedRoute } from '@/lib/auth-context';
 import type { BasketballGame } from '@/lib/basketball-validator';
@@ -28,8 +28,10 @@ interface Submission {
   };
 }
 
-function SubmissionDetail({ params }: { params: { id: string } }) {
+function SubmissionDetail() {
   const router = useRouter();
+  const params = useParams();
+  const id = params.id as string;
   const { token } = useAuth();
   const [submission, setSubmission] = useState<Submission | null>(null);
   const [validationErrors, setValidationErrors] = useState<ValidationError[]>([]);
@@ -39,14 +41,15 @@ function SubmissionDetail({ params }: { params: { id: string } }) {
 
   // Load submission data
   useEffect(() => {
+    console.log('Submission ID:', id);
     loadSubmission();
-  }, [params.id]);
+  }, [id]);
 
   const loadSubmission = async () => {
     if (!token) return;
 
     try {
-      const response = await fetch(`/api/submissions/${params.id}`, {
+      const response = await fetch(`/api/submissions/${id}`, {
         headers: {
           Authorization: `Bearer ${token}`,
         },
@@ -74,7 +77,7 @@ function SubmissionDetail({ params }: { params: { id: string } }) {
     setError(null);
 
     try {
-      const response = await fetch(`/api/submissions/${params.id}/approve`, {
+      const response = await fetch(`/api/submissions/${id}/approve`, {
         method: 'POST',
         headers: {
           Authorization: `Bearer ${token}`,
@@ -212,15 +215,15 @@ function SubmissionDetail({ params }: { params: { id: string } }) {
                   <div className="grid grid-cols-2 gap-4 text-sm">
                     <div>
                       <span className="text-gray-600">Date:</span>
-                      <span className="ml-2 font-medium">{game.date || 'Not found'}</span>
+                      <span className="ml-2 font-medium text-gray-900">{game.date || 'Not found'}</span>
                     </div>
                     <div>
                       <span className="text-gray-600">Location:</span>
-                      <span className="ml-2 font-medium">{game.location || 'N/A'}</span>
+                      <span className="ml-2 font-medium text-gray-900">{game.location || 'N/A'}</span>
                     </div>
                     <div>
                       <span className="text-gray-600">Overtime:</span>
-                      <span className="ml-2 font-medium">{game.overtime ? 'Yes' : 'No'}</span>
+                      <span className="ml-2 font-medium text-gray-900">{game.overtime ? 'Yes' : 'No'}</span>
                     </div>
                   </div>
                 </div>
@@ -247,7 +250,7 @@ function SubmissionDetail({ params }: { params: { id: string } }) {
                   <div className="overflow-x-auto">
                     <table className="min-w-full text-sm">
                       <thead className="bg-gray-50">
-                        <tr>
+                        <tr className="text-gray-900">
                           <th className="px-3 py-2 text-left">#</th>
                           <th className="px-3 py-2 text-left">Name</th>
                           <th className="px-3 py-2 text-right">PTS</th>
@@ -256,7 +259,7 @@ function SubmissionDetail({ params }: { params: { id: string } }) {
                       </thead>
                       <tbody className="divide-y">
                         {game.homeTeam.players.map((player, i) => (
-                          <tr key={i}>
+                          <tr key={i} className="text-gray-900">
                             <td className="px-3 py-2">{player.number || '?'}</td>
                             <td className="px-3 py-2">{player.name || 'Unknown'}</td>
                             <td className="px-3 py-2 text-right font-medium">{player.points}</td>
@@ -274,7 +277,7 @@ function SubmissionDetail({ params }: { params: { id: string } }) {
                   <div className="overflow-x-auto">
                     <table className="min-w-full text-sm">
                       <thead className="bg-gray-50">
-                        <tr>
+                        <tr className="text-gray-900">
                           <th className="px-3 py-2 text-left">#</th>
                           <th className="px-3 py-2 text-left">Name</th>
                           <th className="px-3 py-2 text-right">PTS</th>
@@ -283,7 +286,7 @@ function SubmissionDetail({ params }: { params: { id: string } }) {
                       </thead>
                       <tbody className="divide-y">
                         {game.awayTeam.players.map((player, i) => (
-                          <tr key={i}>
+                          <tr key={i} className="text-gray-900">
                             <td className="px-3 py-2">{player.number || '?'}</td>
                             <td className="px-3 py-2">{player.name || 'Unknown'}</td>
                             <td className="px-3 py-2 text-right font-medium">{player.points}</td>
@@ -320,10 +323,10 @@ function SubmissionDetail({ params }: { params: { id: string } }) {
   );
 }
 
-export default function SubmissionPage({ params }: { params: { id: string } }) {
+export default function SubmissionPage() {
   return (
     <ProtectedRoute>
-      <SubmissionDetail params={params} />
+      <SubmissionDetail />
     </ProtectedRoute>
   );
 }

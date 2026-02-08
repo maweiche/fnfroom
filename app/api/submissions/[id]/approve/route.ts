@@ -11,9 +11,12 @@ import type { BasketballGame } from '@/lib/basketball-validator';
  */
 export async function POST(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    // In Next.js 15+, params is a Promise
+    const { id } = await params;
+
     // Authenticate user
     const token = getTokenFromHeader(request.headers.get('authorization'));
     if (!token) {
@@ -27,7 +30,7 @@ export async function POST(
 
     // Get submission
     const submission = await prisma.submission.findUnique({
-      where: { id: params.id },
+      where: { id },
     });
 
     if (!submission) {

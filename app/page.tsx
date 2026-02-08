@@ -1,4 +1,7 @@
-import { VideoHero } from "@/components/video-hero";
+import { CTAMarquee } from "@/components/cta-marquee";
+import { Navigation } from "@/components/navigation";
+import { HeroGrid } from "@/components/hero-grid";
+import { UpcomingGames } from "@/components/upcoming-games";
 import { ArticlesGrid } from "@/components/articles-grid";
 import { VideoSpotlight } from "@/components/video-spotlight";
 import { RankingsSnapshot } from "@/components/rankings-snapshot";
@@ -12,7 +15,7 @@ import {
 } from "@/sanity/lib/fetch";
 import type { Sport } from "@/lib/sanity.types";
 
-export const revalidate = 60; // Revalidate every 60 seconds
+export const revalidate = 60; // Disable cache during development (change to 60 for production)
 
 export default async function HomePage() {
   // Fetch all data in parallel for maximum performance
@@ -30,7 +33,7 @@ export default async function HomePage() {
     : latestArticles;
 
   // Get video playback ID for hero background
-  const heroVideoPlaybackId = featuredVideo?.video?.asset?.playbackId
+  const heroVideoPlaybackId = featuredVideo?.video?.asset?.playbackId || "aBAAX02C6teTYmicbe00heMnhOro7GjDx00pAVQ02yIPSjo"
 
   // Transform rankings data for the snapshot component
   const rankings = Object.entries(rankingsData)
@@ -51,11 +54,28 @@ export default async function HomePage() {
 
   return (
     <div className="min-h-screen">
-      {/* Video Hero Background */}
-      <VideoHero article={featuredArticle ?? undefined} videoPlaybackId={heroVideoPlaybackId} />
+      {/* CTA Marquee Banner - Above Everything */}
+      
 
-      {/* Latest Articles Grid */}
-      <ArticlesGrid articles={displayArticles} title="Latest Stories" priority />
+      {/* Hero Section - Title + Cards Fill Viewport */}
+      <div className="flex flex-col" style={{ minHeight: 'calc(100vh - 48px)' }}>
+        {/* Hero Grid (1-2 Layout) - Featured Article, Video, Games of Week */}
+        <HeroGrid
+          featuredArticle={featuredArticle ?? undefined}
+          featuredVideoPlaybackId={heroVideoPlaybackId}
+        />
+      </div>
+
+      {/* Upcoming Games Section */}
+      <UpcomingGames />
+
+      {/* Latest Articles Grid with Filters */}
+      <ArticlesGrid
+        articles={displayArticles}
+        title="Latest News"
+        priority
+        showFilters={true}
+      />
 
       {/* Video Spotlight Section */}
       {latestVideos.length > 0 && <VideoSpotlight videos={latestVideos} />}

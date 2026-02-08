@@ -4,8 +4,7 @@
  * Usage: bun scripts/create-user.ts
  */
 
-import { createUser } from '../lib/auth';
-import type { Role } from '@prisma/client';
+import { createUser, type Role } from '../lib/auth';
 
 async function promptUser(): Promise<{
   email: string;

@@ -1,7 +1,7 @@
 # Design System: Friday Night Film Room
 
 **Created**: 2026-02-07
-**Last Updated**: 2026-02-07
+**Last Updated**: 2026-02-08
 **Direction**: Precision & Credibility (Sports Editorial Authority)
 
 ## Design Direction
@@ -26,7 +26,7 @@ Four-color system:
 Dense card grids, editorial two-column layouts, table-heavy (rankings/stats), mobile-first responsive.
 
 ### Typography System
-- **Display**: Inter (600-700 weight) for headlines — strong, news-oriented
+- **Display**: Space Grotesk (700-800 weight) for headlines — Athletic, geometric, bold, distinctive
 - **Body**: Inter (400-500 weight) for article text — highly readable
 - **Data**: JetBrains Mono (tabular numerals) for stats, scores, rankings
 

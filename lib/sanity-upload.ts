@@ -57,36 +57,6 @@ export async function uploadImageToSanity(
 }
 
 /**
- * Upload an image from a URL to Sanity CDN
- * Useful for copying images from temporary storage
- */
-export async function uploadImageFromUrl(
-  imageUrl: string,
-  filename: string
-): Promise<UploadResult> {
-  if (!process.env.SANITY_API_TOKEN) {
-    throw new Error('SANITY_API_TOKEN not configured');
-  }
-
-  try {
-    const asset = (await uploadClient.assets.upload('image', imageUrl, {
-      filename,
-    })) as SanityImageAssetDocument;
-
-    return {
-      assetId: asset._id,
-      url: asset.url,
-      originalFilename: asset.originalFilename || filename,
-      size: asset.size,
-      mimeType: asset.mimeType,
-    };
-  } catch (error) {
-    console.error('Sanity upload from URL error:', error);
-    throw new Error(`Failed to upload image from URL to Sanity: ${error}`);
-  }
-}
-
-/**
  * Delete an image from Sanity CDN
  * @param assetId - The Sanity asset ID (e.g., "image-abc123-500x500-jpg")
  */
