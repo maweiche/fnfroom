@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import Image from 'next/image';
+import { useAuth, ProtectedRoute } from '@/lib/auth-context';
 import type { BasketballGame } from '@/lib/basketball-validator';
 
 interface ValidationError {
@@ -27,8 +28,9 @@ interface Submission {
   };
 }
 
-export default function SubmissionPage({ params }: { params: { id: string } }) {
+function SubmissionDetail({ params }: { params: { id: string } }) {
   const router = useRouter();
+  const { token } = useAuth();
   const [submission, setSubmission] = useState<Submission | null>(null);
   const [validationErrors, setValidationErrors] = useState<ValidationError[]>([]);
   const [loading, setLoading] = useState(true);
@@ -41,13 +43,9 @@ export default function SubmissionPage({ params }: { params: { id: string } }) {
   }, [params.id]);
 
   const loadSubmission = async () => {
-    try {
-      // TODO: Get auth token from context/cookie
-      const token = localStorage.getItem('authToken');
-      if (!token) {
-        throw new Error('Please log in first');
-      }
+    if (!token) return;
 
+    try {
       const response = await fetch(`/api/submissions/${params.id}`, {
         headers: {
           Authorization: `Bearer ${token}`,
@@ -70,15 +68,12 @@ export default function SubmissionPage({ params }: { params: { id: string } }) {
   };
 
   const handleApprove = async () => {
-    if (!submission?.rawAiResponse) return;
+    if (!submission?.rawAiResponse || !token) return;
 
     setApproving(true);
     setError(null);
 
     try {
-      const token = localStorage.getItem('authToken');
-      if (!token) throw new Error('Please log in first');
-
       const response = await fetch(`/api/submissions/${params.id}/approve`, {
         method: 'POST',
         headers: {
@@ -322,5 +317,13 @@ export default function SubmissionPage({ params }: { params: { id: string } }) {
         </div>
       </div>
     </div>
+  );
+}
+
+export default function SubmissionPage({ params }: { params: { id: string } }) {
+  return (
+    <ProtectedRoute>
+      <SubmissionDetail params={params} />
+    </ProtectedRoute>
   );
 }

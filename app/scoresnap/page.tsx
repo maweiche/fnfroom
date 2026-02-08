@@ -3,9 +3,11 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Image from 'next/image';
+import { useAuth, ProtectedRoute } from '@/lib/auth-context';
 
-export default function ScoreSnapUploadPage() {
+function ScoreSnapUpload() {
   const router = useRouter();
+  const { token, user, logout } = useAuth();
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
   const [uploading, setUploading] = useState(false);
@@ -39,18 +41,12 @@ export default function ScoreSnapUploadPage() {
   };
 
   const handleUpload = async () => {
-    if (!selectedFile) return;
+    if (!selectedFile || !token) return;
 
     setUploading(true);
     setError(null);
 
     try {
-      // TODO: Get auth token from context/cookie
-      const token = localStorage.getItem('authToken');
-      if (!token) {
-        throw new Error('Please log in first');
-      }
-
       // Create form data
       const formData = new FormData();
       formData.append('image', selectedFile);
@@ -84,6 +80,32 @@ export default function ScoreSnapUploadPage() {
   return (
     <div className="min-h-screen bg-gray-50 py-12 px-4">
       <div className="max-w-3xl mx-auto">
+        {/* User Header */}
+        <div className="mb-6 flex justify-between items-center">
+          <div>
+            <p className="text-sm text-gray-600">
+              Signed in as <strong>{user?.email}</strong>
+            </p>
+            {user?.schoolName && (
+              <p className="text-xs text-gray-500">{user.schoolName}</p>
+            )}
+          </div>
+          <div className="flex gap-2">
+            <button
+              onClick={() => router.push('/change-password')}
+              className="px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 rounded-lg transition-colors"
+            >
+              Change Password
+            </button>
+            <button
+              onClick={logout}
+              className="px-4 py-2 text-sm text-red-600 hover:bg-red-50 rounded-lg transition-colors"
+            >
+              Sign Out
+            </button>
+          </div>
+        </div>
+
         {/* Header */}
         <div className="text-center mb-8">
           <h1 className="text-4xl font-bold text-gray-900 mb-2">
@@ -223,5 +245,13 @@ export default function ScoreSnapUploadPage() {
         </div>
       </div>
     </div>
+  );
+}
+
+export default function ScoreSnapUploadPage() {
+  return (
+    <ProtectedRoute>
+      <ScoreSnapUpload />
+    </ProtectedRoute>
   );
 }
