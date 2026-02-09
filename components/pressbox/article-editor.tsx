@@ -13,9 +13,10 @@ interface ArticleEditorProps {
     published: boolean;
     editCount: number;
   };
+  token: string;
 }
 
-export function ArticleEditor({ article: initialArticle }: ArticleEditorProps) {
+export function ArticleEditor({ article: initialArticle, token }: ArticleEditorProps) {
   const [headline, setHeadline] = useState(initialArticle.headline);
   const [body, setBody] = useState(initialArticle.bodyMarkdown);
   const [isSaving, setIsSaving] = useState(false);
@@ -26,7 +27,6 @@ export function ArticleEditor({ article: initialArticle }: ArticleEditorProps) {
   const handleSave = async () => {
     setIsSaving(true);
     try {
-      const token = localStorage.getItem('token');
       await fetch('/api/pressbox/article', {
         method: 'PATCH',
         headers: {
@@ -55,7 +55,6 @@ export function ArticleEditor({ article: initialArticle }: ArticleEditorProps) {
 
   const handlePublish = async () => {
     try {
-      const token = localStorage.getItem('token');
       await fetch('/api/pressbox/article', {
         method: 'PUT',
         headers: {

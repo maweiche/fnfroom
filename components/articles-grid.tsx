@@ -55,7 +55,7 @@ export function ArticlesGrid({
 
   if (articles.length === 0) {
     return (
-      <section className="py-16 md:py-24">
+      <section className="py-16 md:py-24 bg-gradient-to-b from-transparent to-cloud-gray/20 dark:to-transparent">
         <div className="container-content">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
@@ -63,10 +63,13 @@ export function ArticlesGrid({
             viewport={{ once: true }}
             transition={{ duration: 0.6 }}
           >
-            <h2 className="text-3xl md:text-4xl font-bold mb-8">{title}</h2>
-            <div className="p-12 text-center bg-card border border-border rounded-lg">
-              <p className="text-secondary mb-4">
-                No articles published yet. Check back soon for the latest coverage.
+            <h2 className="text-3xl md:text-4xl font-bold mb-8 text-foreground">{title}</h2>
+            <div className="p-12 text-center bg-card border border-border rounded-lg shadow-sm">
+              <p className="text-foreground mb-2 font-medium">
+                No articles published yet
+              </p>
+              <p className="text-muted text-sm">
+                Check back soon for the latest coverage.
               </p>
             </div>
           </motion.div>
@@ -76,7 +79,7 @@ export function ArticlesGrid({
   }
 
   return (
-    <section className="py-16 md:py-24 bg-gradient-to-b from-transparent to-cloud-gray/30">
+    <section className="py-16 md:py-24 bg-gradient-to-b from-transparent to-cloud-gray/20 dark:to-transparent">
       <div className="container-content">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
@@ -87,7 +90,7 @@ export function ArticlesGrid({
         >
           <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-6">
             <div>
-              <h2 className="font-display text-3xl md:text-4xl font-bold">
+              <h2 className="font-display text-3xl md:text-4xl font-bold text-foreground">
                 {title}
               </h2>
               <motion.div

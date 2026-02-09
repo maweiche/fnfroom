@@ -60,6 +60,22 @@ bun run typecheck
 bun run lint
 ```
 
+## Test Credentials
+
+### Press Box AI (Writers)
+Voice-to-article platform at `/pressbox/login`:
+
+- **Email**: `maweiche@gmail.com`
+- **Password**: `writer123`
+- **Role**: WRITER
+
+### ScoreSnap (Coaches)
+AI-powered score submission at `/scoresnap/login`:
+
+- **Default temp password**: `TempPass123!`
+- Create coach: `bun scripts/add-coach.ts <email> <name> [school]`
+- Verify coach: `bun scripts/verify-coach.ts <email>`
+
 ## Project Structure
 
 ```

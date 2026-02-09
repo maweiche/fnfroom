@@ -43,7 +43,7 @@ export default async function PressBoxPage() {
   const auth = await getAuthUser();
 
   if (!auth) {
-    redirect('/login?redirect=/pressbox');
+    redirect('/pressbox/login?redirect=/pressbox');
   }
 
   const [conversations, articles] = await Promise.all([
@@ -51,5 +51,5 @@ export default async function PressBoxPage() {
     getArticles(auth.token),
   ]);
 
-  return <Dashboard conversations={conversations} articles={articles} />;
+  return <Dashboard conversations={conversations} articles={articles} token={auth.token} />;
 }

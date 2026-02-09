@@ -30,9 +30,10 @@ interface Article {
 interface DashboardProps {
   conversations: Conversation[];
   articles: Article[];
+  token: string;
 }
 
-export function Dashboard({ conversations: initialConversations, articles: initialArticles }: DashboardProps) {
+export function Dashboard({ conversations: initialConversations, articles: initialArticles, token }: DashboardProps) {
   const [showNewConversationForm, setShowNewConversationForm] = useState(false);
   const [isCreating, setIsCreating] = useState(false);
   const router = useRouter();
@@ -50,7 +51,6 @@ export function Dashboard({ conversations: initialConversations, articles: initi
     setIsCreating(true);
 
     try {
-      const token = localStorage.getItem('token');
       const response = await fetch('/api/pressbox/conversation', {
         method: 'POST',
         headers: {
@@ -63,13 +63,18 @@ export function Dashboard({ conversations: initialConversations, articles: initi
         }),
       });
 
-      if (!response.ok) throw new Error('Failed to create conversation');
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({}));
+        console.error('API Error:', response.status, errorData);
+        throw new Error(errorData.error || `Failed to create conversation (${response.status})`);
+      }
 
       const { conversation } = await response.json();
       router.push(`/pressbox/conversation/${conversation.id}`);
     } catch (err) {
-      console.error(err);
-      alert('Failed to create conversation');
+      console.error('Create conversation error:', err);
+      const errorMessage = err instanceof Error ? err.message : 'Failed to create conversation';
+      alert(errorMessage);
     } finally {
       setIsCreating(false);
     }

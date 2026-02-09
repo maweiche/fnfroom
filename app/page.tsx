@@ -19,18 +19,16 @@ export const revalidate = 60; // Disable cache during development (change to 60 
 
 export default async function HomePage() {
   // Fetch all data in parallel for maximum performance
-  const [featuredArticle, latestArticles, latestVideos, featuredVideo, rankingsData] = await Promise.all([
-    getFeaturedArticle(),
-    getLatestArticles(9),
+  const [latestArticles, latestVideos, featuredVideo, rankingsData] = await Promise.all([
+    getLatestArticles(11), // Get 11 articles: 2 for hero, 9 for grid
     getLatestVideos(6),
     getFeaturedVideo(),
     getLatestRankingsBySport(),
   ]);
 
-  // If there's a featured article, filter it out from latest articles
-  const displayArticles = featuredArticle
-    ? latestArticles.filter((article) => article._id !== featuredArticle._id)
-    : latestArticles;
+  // Split articles: first 2 for hero, rest for grid
+  const heroArticles = latestArticles.slice(0, 2);
+  const displayArticles = latestArticles.slice(2);
 
   // Get video playback ID for hero background
   const heroVideoPlaybackId = featuredVideo?.video?.asset?.playbackId || "aBAAX02C6teTYmicbe00heMnhOro7GjDx00pAVQ02yIPSjo"
@@ -59,9 +57,9 @@ export default async function HomePage() {
 
       {/* Hero Section - Title + Cards Fill Viewport */}
       <div className="flex flex-col" style={{ minHeight: 'calc(100vh - 48px)' }}>
-        {/* Hero Grid (1-2 Layout) - Featured Article, Video, Games of Week */}
+        {/* Hero Grid (1-2 Layout) - Featured Articles, Video, Games of Week */}
         <HeroGrid
-          featuredArticle={featuredArticle ?? undefined}
+          featuredArticles={heroArticles}
           featuredVideoPlaybackId={heroVideoPlaybackId}
         />
       </div>

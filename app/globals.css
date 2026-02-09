@@ -8,128 +8,134 @@
 @layer base {
   :root {
     /* Core colors - Light mode */
-    --background: 0 0% 100%; /* #fbfbfa - Slightly off-white for warmth */
-    --foreground: 0 0% 3.9%; /* #171717 - Deep black for text */
+    --background: 30 14% 98%; /* #fbfbfa - Slightly off-white for warmth */
+    --foreground: 0 0% 9%; /* #171717 - Deep black for text */
 
-    /* Primary brand colors - Friday Night Film Room green */
-    --primary: 0 0% 9%; /* #94d873 - Brand green */
-    --primary-dark: 120 100% 12%; /* #003d00 - Deep green for contrast */
-    --primary-light: 103 65% 90%; /* #e1f8d8 - Light green backgrounds */
-    --primary-foreground: 0 0% 98%;
+    /* Primary brand colors - Spotlight Gold (Cinematic) */
+    --primary: 42 48% 62%; /* #E6BC6A - True golden spotlight */
+    --primary-dark: 42 40% 40%; /* #99863D - Darker gold for contrast */
+    --primary-light: 42 50% 90%; /* #F7EED9 - Cream highlight */
+    --primary-foreground: 0 0% 9%;
 
-    /* Secondary colors - Professional gray hierarchy */
-    --secondary: 0 0% 35%; /* #595959 - Dark gray for secondary text */
+    /* Secondary colors - Warm gray hierarchy */
+    --secondary: 0 0% 35%; /* #595959 - Warm dark gray for secondary text */
     --secondary-foreground: 0 0% 9%;
 
-    /* Muted colors - Four-level hierarchy */
+    /* Muted colors - Warm neutral hierarchy */
     --muted: 0 0% 45%; /* #737373 - Muted text */
     --muted-foreground: 0 0% 30%; /* #4d4d4d - Stronger muted */
 
     /* Accent (primary for actions) */
-    --accent: 0 0% 95%;
+    --accent: 42 48% 62%;
     --accent-foreground: 0 0% 9%;
 
     /* Card backgrounds */
-    --card: 0 0% 100%; /* #ffffff - Pure white cards on off-white bg */
-    --card-foreground: 0 0% 3.9%;
-    --card-mint: 103 45% 97%; /* #f5fdf2 - Subtle green tint */
-    --card-peach: 27 100% 97%; /* #fff5f0 - Warm accent */
-    --card-sky: 207 100% 97%; /* #f0f7ff - Cool accent */
+    --card: 0 0% 100%; /* #ffffff - Pure white cards */
+    --card-foreground: 0 0% 9%;
+    --card-gold: 42 50% 97%; /* #FBF9F0 - Warm gold tint */
+    --card-rust: 27 50% 96%; /* #faf3ed - Burnt orange tint */
+    --card-forest: 145 20% 96%; /* #f2f5f3 - Dark green tint */
 
     /* Border */
-    --border: 0 0% 89.8%; /* #e6e6e6 - Neutral border */
-    --input: 0 0% 89.8%;
-    --ring: 0 0% 3.9%;
+    --border: 0 0% 90%; /* #e6e6e6 - Neutral border */
+    --input: 0 0% 90%;
+    --ring: 42 48% 62%;
 
-    /* Sport-specific colors - Spec-defined */
-    --basketball: 27 81% 51%; /* #E67E22 - Orange */
-    --football: 145 63% 42%; /* #27AE60 - Green */
-    --lacrosse: 207 70% 45%; /* #2980B9 - Blue */
+    /* Sport-specific colors - Cinematic warmer palette */
+    --basketball: 27 65% 53%; /* #D97B34 - Deep burnt orange */
+    --football: 145 33% 27%; /* #2d5a3d - Deep forest green */
+    --lacrosse: 213 52% 25%; /* #1e3a5f - Deep navy blue */
 
     /* Semantic colors */
-    --success: 110 50% 58%; /* #83c961 - Softer green */
-    --error: 6 78% 62%; /* #f7604c - Error red */
-    --warning: 27 90% 60%; /* #f78535 - Warning orange */
-    --info: 215 65% 55%; /* #4864d2 - Info blue */
+    --success: 100 25% 50%; /* #7a9b5f - Muted olive green */
+    --error: 4 60% 58%; /* #d9534f - Warm red */
+    --warning: 27 65% 53%; /* #D97B34 - Warm orange */
+    --info: 213 30% 49%; /* #5a7a9e - Muted blue */
 
-    /* Custom brand accents */
-    --cloud-gray: 30 6% 95%; /* #f1f0ee - Soft background */
-    --charcoal: 0 0% 13%; /* #212121 - Brand dark */
-    --meadow: 103 57% 65%; /* #94d873 - Brand green accent */
-    --pearl: 0 0% 99%; /* #fbfbfa - Brand light */
-
-    /* Navy header - Dark navigation */
-    --navy-header: 225 20% 14%; /* #1a1d29 */
+    /* Custom brand accents - Cinematic */
+    --spotlight-gold: 42 48% 62%; /* #E6BC6A - Main spotlight */
+    --warm-cream: 42 50% 90%; /* #F7EED9 - Warm highlights */
+    --film-gray: 0 0% 54%; /* #8a8a8a - Neutral gray */
+    --charcoal-black: 32 15% 9%; /* #1a1612 - Deep warm charcoal */
+    --pearl: 30 14% 98%; /* #fbfbfa - Brand light */
 
     /* Border radius - Sharp system for editorial feel */
     --radius: 0.5rem;
     --radius-sm: 4px;
     --radius-lg: 12px;
     --popover: 0 0% 100%;
-    --popover-foreground: 0 0% 3.9%;
-    --destructive: 0 84.2% 60.2%;
+    --popover-foreground: 0 0% 9%;
+    --destructive: 4 60% 58%;
     --destructive-foreground: 0 0% 98%;
-    --chart-1: 12 76% 61%;
-    --chart-2: 173 58% 39%;
-    --chart-3: 197 37% 24%;
-    --chart-4: 43 74% 66%;
-    --chart-5: 27 87% 67%;
+    --chart-1: 42 48% 62%;
+    --chart-2: 145 33% 27%;
+    --chart-3: 213 52% 25%;
+    --chart-4: 27 65% 53%;
+    --chart-5: 100 25% 50%;
   }
 
   .dark {
-    /* Core colors - Dark mode */
-    --background: 0 0% 3.9%; /* #272729 - Dark charcoal */
-    --foreground: 0 0% 98%; /* #fbfbfa - Off-white text */
+    /* Core colors - Dark mode (PRIMARY EXPERIENCE) */
+    --background: 42 20% 9%; /* #1D1A10 - Deep warm charcoal */
+    --foreground: 42 50% 90%; /* #F7EED9 - Warm cream text */
 
-    /* Primary brand colors */
-    --primary: 0 0% 98%; /* #94d873 - Same brand green */
-    --primary-dark: 134 32% 29%; /* #306332 - Darker green for dark mode */
-    --primary-light: 103 30% 20%; /* #2d4a25 - Dark green background */
-    --primary-foreground: 0 0% 9%;
+    /* Primary brand colors - Spotlight Gold */
+    --primary: 42 48% 62%; /* #E6BC6A - True golden spotlight */
+    --primary-dark: 42 40% 40%; /* #99863D - Darker gold */
+    --primary-light: 42 30% 18%; /* #453B1C - Dark gold tint */
+    --primary-foreground: 42 20% 9%;
 
-    /* Secondary colors */
-    --secondary: 0 0% 14.9%; /* #f0f0f0 - Light gray for dark mode */
-    --secondary-foreground: 0 0% 98%;
+    /* Secondary colors - Warm gray for dark mode */
+    --secondary: 42 18% 68%; /* #BDB095 - Warm light gray */
+    --secondary-foreground: 42 50% 90%;
 
-    /* Muted colors - Four-level hierarchy inverted */
-    --muted: 0 0% 14.9%; /* #a6a6a6 - Muted text */
-    --muted-foreground: 0 0% 63.9%; /* #cccccc - Stronger muted */
+    /* Muted colors - Warm neutrals */
+    --muted: 42 12% 48%; /* #8C8269 - Warm muted gray */
+    --muted-foreground: 42 18% 68%; /* Lighter warm gray */
 
     /* Accent */
-    --accent: 0 0% 14.9%;
-    --accent-foreground: 0 0% 98%;
+    --accent: 42 48% 62%;
+    --accent-foreground: 42 20% 9%;
 
-    /* Card backgrounds - Elevated surfaces */
-    --card: 0 0% 3.9%; /* #333333 - Elevated card */
-    --card-foreground: 0 0% 98%;
-    --card-mint: 103 20% 18%; /* #26332a - Dark green tint */
-    --card-peach: 27 35% 20%; /* #3d2e28 - Dark warm tint */
-    --card-sky: 207 25% 20%; /* #26303d - Dark cool tint */
+    /* Card backgrounds - Warm elevated surfaces */
+    --card: 42 20% 13%; /* #27230F - Warm dark card */
+    --card-foreground: 42 50% 90%;
+    --card-gold: 42 30% 18%; /* #453B1C - Dark gold tint */
+    --card-rust: 27 35% 20%; /* #3d2e28 - Dark rust tint */
+    --card-forest: 145 20% 18%; /* #26332a - Dark green tint */
 
-    /* Border - More prominent in dark mode */
-    --border: 0 0% 14.9%; /* #404040 - Visible border */
-    --input: 0 0% 14.9%;
-    --ring: 0 0% 83.1%;
+    /* Border - Warm-tinted borders */
+    --border: 42 12% 22%; /* #40391F - Warm border */
+    --input: 42 12% 22%;
+    --ring: 42 48% 62%;
 
-    /* Sport-specific colors - Slightly desaturated for dark mode */
-    --basketball: 27 75% 55%; /* Slightly softer orange */
-    --football: 145 55% 45%; /* Slightly softer green */
-    --lacrosse: 207 65% 50%; /* Slightly softer blue */
+    /* Sport-specific colors - Maintained vibrancy for dark */
+    --basketball: 27 65% 53%; /* #D97B34 - Deep burnt orange */
+    --football: 145 33% 27%; /* #2d5a3d - Deep forest green */
+    --lacrosse: 213 52% 25%; /* #1e3a5f - Deep navy blue */
 
-    /* Semantic colors - Adjusted for dark backgrounds */
-    --success: 140 50% 40%; /* #4c7a4c - Forest green */
-    --error: 0 80% 85%; /* #ffb3b3 - Light red for visibility */
-    --warning: 27 100% 75%; /* #f7c6a0 - Light orange */
-    --info: 215 50% 75%; /* #c2d4e6 - Light blue */
+    /* Semantic colors - Warm for dark backgrounds */
+    --success: 100 28% 48%; /* #6b8a50 - Muted olive */
+    --error: 4 60% 58%; /* #d9534f - Warm red */
+    --warning: 27 65% 53%; /* #D97B34 - Warm orange */
+    --info: 213 35% 55%; /* #7a9abe - Muted blue */
 
-    /* Custom brand accents - Dark variants */
-    --cloud-gray: 0 0% 20%; /* #333333 - Dark surface */
-    --charcoal: 0 0% 13%; /* #212121 - Darker accent */
-    --meadow: 103 57% 65%; /* #94d873 - Same brand green */
-    --pearl: 0 0% 25%; /* #404040 - Dark pearl */
+    /* Custom brand accents - Cinematic dark mode */
+    --spotlight-gold: 42 48% 62%; /* #E6BC6A - Main spotlight */
+    --warm-cream: 42 50% 90%; /* #F7EED9 - Warm highlights */
+    --film-gray: 0 0% 54%; /* #8a8a8a - Neutral gray */
+    --charcoal-black: 42 20% 9%; /* #1D1A10 - Deep charcoal */
+    --pearl: 42 20% 18%; /* #33300E - Dark pearl */
 
-    /* Navy header - Lighter in dark mode for contrast */
-    --navy-header: 0 0% 13%; /* #212121 - Matches charcoal */ --popover: 0 0% 3.9%; --popover-foreground: 0 0% 98%; --destructive: 0 62.8% 30.6%; --destructive-foreground: 0 0% 98%; --chart-1: 220 70% 50%; --chart-2: 160 60% 45%; --chart-3: 30 80% 55%; --chart-4: 280 65% 60%; --chart-5: 340 75% 55%;
+    --popover: 42 20% 13%;
+    --popover-foreground: 42 50% 90%;
+    --destructive: 4 60% 58%;
+    --destructive-foreground: 42 50% 90%;
+    --chart-1: 42 48% 62%;
+    --chart-2: 145 33% 27%;
+    --chart-3: 213 52% 25%;
+    --chart-4: 27 65% 53%;
+    --chart-5: 100 25% 50%;
   }
 }
 
@@ -138,25 +144,82 @@
     @apply border-border;
   }
 
+  html {
+    min-height: 100%;
+    @apply bg-background;
+  }
+
   body {
     @apply bg-background text-foreground antialiased;
     font-feature-settings: "rlig" 1, "calt" 1;
     font-size: 14px; /* Base 14px for editorial density */
+    min-height: 100vh;
   }
 
-  /* Typography hierarchy - Editorial style */
+  /* Carbon fiber texture background for dark mode - Athletic high-performance aesthetic */
+  html.dark,
+  body.dark,
+  .dark,
+  .dark html,
+  .dark body {
+    background-color: #1D1A10 !important; /* Direct color for reliability */
+  }
+
+  html.dark,
+  .dark html,
+  .dark body {
+    background-image:
+      /* Diagonal weave pattern 1 */
+      repeating-linear-gradient(
+        45deg,
+        transparent 0px,
+        transparent 3px,
+        rgba(0, 0, 0, 0.4) 3px,
+        rgba(0, 0, 0, 0.4) 6px
+      ),
+      /* Diagonal weave pattern 2 */
+      repeating-linear-gradient(
+        -45deg,
+        transparent 0px,
+        transparent 3px,
+        rgba(0, 0, 0, 0.35) 3px,
+        rgba(0, 0, 0, 0.35) 6px
+      ),
+      /* Subtle horizontal lines for depth */
+      repeating-linear-gradient(
+        90deg,
+        transparent 0px,
+        transparent 1px,
+        rgba(0, 0, 0, 0.15) 1px,
+        rgba(0, 0, 0, 0.15) 2px
+      ),
+      /* Base gradient for subtle variation */
+      linear-gradient(
+        135deg,
+        rgba(24, 21, 14, 1) 0%,
+        rgba(29, 26, 16, 1) 50%,
+        rgba(24, 21, 14, 1) 100%
+      );
+    background-size: 12px 12px, 12px 12px, 100% 2px, 100% 100%;
+    background-position: 0 0, 0 0, 0 0, 0 0;
+  }
+
+  /* Typography hierarchy - Cinematic dramatic contrast */
   h1 {
-    @apply font-display text-4xl font-bold tracking-tight;
+    @apply font-display text-4xl tracking-tight;
+    font-weight: 800; /* Dramatic bold for maximum contrast */
     line-height: 1.1;
   }
 
   h2 {
-    @apply font-display text-3xl font-bold tracking-tight;
+    @apply font-display text-3xl tracking-tight;
+    font-weight: 800; /* Matches logo's bold condensed type */
     line-height: 1.2;
   }
 
   h3 {
-    @apply font-display text-2xl font-semibold tracking-tight;
+    @apply font-display text-2xl tracking-tight;
+    font-weight: 700; /* Strong but slightly less than h1/h2 */
     line-height: 1.25;
   }
 
@@ -199,35 +262,47 @@
 }
 
 @layer utilities {
-  /* Sport tag pill components - Spec-defined colors */
+  /* Sport tag pill components - Cinematic warm colors */
   .sport-tag-basketball {
-    @apply inline-flex items-center px-2 py-1 rounded text-xs font-medium bg-basketball text-white;
+    @apply inline-flex items-center px-2 py-1 rounded text-xs font-medium text-white;
+    background-color: hsl(var(--basketball));
   }
 
   .sport-tag-football {
-    @apply inline-flex items-center px-2 py-1 rounded text-xs font-medium bg-football text-white;
+    @apply inline-flex items-center px-2 py-1 rounded text-xs font-medium text-white;
+    background-color: hsl(var(--football));
   }
 
   .sport-tag-lacrosse {
-    @apply inline-flex items-center px-2 py-1 rounded text-xs font-medium bg-lacrosse text-white;
+    @apply inline-flex items-center px-2 py-1 rounded text-xs font-medium text-white;
+    background-color: hsl(var(--lacrosse));
   }
 
-  /* Shadow utilities - Subtle elevation for editorial feel */
+  /* Shadow utilities - Warm cinematic elevation */
   .shadow-card {
-    box-shadow: 0 2px 8px -2px rgba(0, 0, 0, 0.12), 0 1px 4px -1px rgba(0, 0, 0, 0.08);
+    box-shadow: 0 2px 8px -2px rgba(26, 22, 18, 0.12), 0 1px 4px -1px rgba(26, 22, 18, 0.08);
   }
 
   .shadow-card-hover {
-    box-shadow: 0 8px 16px -4px rgba(0, 0, 0, 0.16), 0 4px 8px -2px rgba(0, 0, 0, 0.12);
+    box-shadow: 0 8px 16px -4px rgba(26, 22, 18, 0.16), 0 4px 8px -2px rgba(26, 22, 18, 0.12);
   }
 
-  /* Dark mode shadow adjustments */
+  /* Dark mode - Warm spotlight glow effects */
   .dark .shadow-card {
-    box-shadow: 0 2px 8px -2px rgba(0, 0, 0, 0.4), 0 1px 4px -1px rgba(0, 0, 0, 0.3);
+    box-shadow: 0 4px 12px rgba(212, 165, 116, 0.12), 0 2px 6px rgba(26, 22, 18, 0.3);
   }
 
   .dark .shadow-card-hover {
-    box-shadow: 0 8px 16px -4px rgba(0, 0, 0, 0.5), 0 4px 8px -2px rgba(0, 0, 0, 0.4);
+    box-shadow: 0 8px 24px rgba(212, 165, 116, 0.2), 0 4px 12px rgba(26, 22, 18, 0.4);
+  }
+
+  /* Spotlight glow for hero sections */
+  .glow-spotlight {
+    box-shadow: 0 0 24px rgba(212, 165, 116, 0.25), 0 0 48px rgba(212, 165, 116, 0.1);
+  }
+
+  .glow-hero {
+    box-shadow: 0 8px 32px rgba(212, 165, 116, 0.3), 0 0 64px rgba(212, 165, 116, 0.15);
   }
 
   /* Content container - Max width for readability */
@@ -260,15 +335,68 @@
   .focus-ring {
     @apply focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 focus:ring-offset-background;
   }
+
+  /* Carbon fiber texture utilities - Apply to cards, sections, hero areas */
+  .carbon-fiber-bg {
+    background-image:
+      repeating-linear-gradient(
+        45deg,
+        transparent 0px,
+        transparent 3px,
+        rgba(0, 0, 0, 0.3) 3px,
+        rgba(0, 0, 0, 0.3) 6px
+      ),
+      repeating-linear-gradient(
+        -45deg,
+        transparent 0px,
+        transparent 3px,
+        rgba(0, 0, 0, 0.25) 3px,
+        rgba(0, 0, 0, 0.25) 6px
+      );
+    background-size: 12px 12px, 12px 12px;
+  }
+
+  .carbon-fiber-subtle {
+    background-image:
+      repeating-linear-gradient(
+        45deg,
+        transparent 0px,
+        transparent 4px,
+        rgba(0, 0, 0, 0.15) 4px,
+        rgba(0, 0, 0, 0.15) 8px
+      ),
+      repeating-linear-gradient(
+        -45deg,
+        transparent 0px,
+        transparent 4px,
+        rgba(0, 0, 0, 0.12) 4px,
+        rgba(0, 0, 0, 0.12) 8px
+      );
+    background-size: 16px 16px, 16px 16px;
+  }
+
+  /* Dark mode intensifies carbon fiber on cards */
+  .dark .carbon-fiber-card {
+    background-color: rgba(39, 35, 15, 0.5);
+    background-image:
+      repeating-linear-gradient(
+        45deg,
+        transparent 0px,
+        transparent 2px,
+        rgba(0, 0, 0, 0.4) 2px,
+        rgba(0, 0, 0, 0.4) 4px
+      ),
+      repeating-linear-gradient(
+        -45deg,
+        transparent 0px,
+        transparent 2px,
+        rgba(0, 0, 0, 0.35) 2px,
+        rgba(0, 0, 0, 0.35) 4px
+      );
+    background-size: 10px 10px, 10px 10px;
+    background-blend-mode: multiply;
+  }
 }
 
 
 
-@layer base {
-  * {
-    @apply border-border;
-  }
-  body {
-    @apply bg-background text-foreground;
-  }
-}

@@ -2,45 +2,57 @@
 
 import Link from "next/link";
 import { useState, useEffect } from "react";
-import { Menu, Sun } from "lucide-react";
-import { motion } from "framer-motion";
+import { Menu, X } from "lucide-react";
+import { motion, AnimatePresence } from "framer-motion";
 import { MoonIcon } from "./moon-icon";
 import { usePathname } from "next/navigation";
-import {
-  Sheet,
-  SheetContent,
-  SheetHeader,
-  SheetTitle,
-} from "@/components/ui/sheet";
+import { Logo } from "./logo";
 
 export function Navigation() {
   const [menuOpen, setMenuOpen] = useState(false);
-  const [theme, setTheme] = useState<"light" | "dark">("light");
+  const [theme, setTheme] = useState<"light" | "dark">("dark");
+  const [scrolled, setScrolled] = useState(false);
   const pathname = usePathname();
 
-  // Initialize theme from localStorage or system preference
+  // Initialize theme from localStorage or default to dark (cinematic primary experience)
   useEffect(() => {
     const stored = localStorage.getItem("theme") as "light" | "dark" | null;
-    const prefersDark = window.matchMedia("(prefers-color-scheme: dark)").matches;
-    const initialTheme = stored || (prefersDark ? "dark" : "light");
+    const initialTheme = stored || "dark";
     setTheme(initialTheme);
-    document.documentElement.classList.toggle("dark", initialTheme === "dark");
+    if (initialTheme === "dark") {
+      document.documentElement.classList.add("dark");
+    } else {
+      document.documentElement.classList.remove("dark");
+    }
+  }, []);
+
+  // Track scroll for header background
+  useEffect(() => {
+    const handleScroll = () => {
+      setScrolled(window.scrollY > 20);
+    };
+    window.addEventListener("scroll", handleScroll);
+    return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
   const toggleTheme = () => {
     const newTheme = theme === "light" ? "dark" : "light";
     setTheme(newTheme);
     localStorage.setItem("theme", newTheme);
-    document.documentElement.classList.toggle("dark", newTheme === "dark");
+    if (newTheme === "dark") {
+      document.documentElement.classList.add("dark");
+    } else {
+      document.documentElement.classList.remove("dark");
+    }
   };
 
   const mainLinks = [
-    { href: "/basketball", label: "Basketball" },
-    { href: "/football", label: "Football" },
-    { href: "/lacrosse", label: "Lacrosse" },
-    { href: "/video", label: "Video" },
-    { href: "/rankings", label: "Rankings" },
-    { href: "/recruiting", label: "Recruiting" },
+    { href: "/basketball", label: "Basketball", color: "basketball" },
+    { href: "/football", label: "Football", color: "football" },
+    { href: "/lacrosse", label: "Lacrosse", color: "lacrosse" },
+    { href: "/video", label: "Video", color: "primary" },
+    { href: "/rankings", label: "Rankings", color: "primary" },
+    { href: "/recruiting", label: "Recruiting", color: "primary" },
   ];
 
   const utilityLinks = [
@@ -55,116 +67,210 @@ export function Navigation() {
     return pathname.startsWith(href);
   };
 
+  const getSportAccentClass = (color: string, isActive: boolean) => {
+    if (!isActive) return "";
+    switch (color) {
+      case "basketball":
+        return "text-[#D97B34] dark:text-[#D97B34]";
+      case "football":
+        return "text-[#2d5a3d] dark:text-[#4c8a5f]";
+      case "lacrosse":
+        return "text-[#1e3a5f] dark:text-[#4a6b9e]";
+      default:
+        return "text-primary";
+    }
+  };
+
   return (
     <>
-      {/* Header Section - Massive Title with Hamburger on Right */}
-      <header className="relative pt-6 pb-4 md:pt-8 md:pb-6">
+      {/* Sticky Navigation Header */}
+      <motion.header
+        initial={{ y: 0 }}
+        className={`sticky top-0 z-50 transition-all duration-200 ${
+          scrolled
+            ? "bg-background/95 backdrop-blur-md border-b border-border shadow-sm"
+            : "bg-transparent"
+        }`}
+      >
         <div className="container mx-auto px-4 md:px-6">
-          <div className="relative">
-            {/* Massive Site Title - Full Width with Theme Toggle as Second O */}
-            <Link href="/" className="block">
-              <h1 className="font-display font-black text-6xl md:text-8xl lg:text-[7.5rem] leading-none tracking-tighter text-foreground hover:text-primary transition-colors duration-150 pr-16 md:pr-20 uppercase">
-                FRIDAY NIGHT FILM RO
-
-                <button
-                  onClick={(e) => {
-                    e.preventDefault();
-                    toggleTheme();
-                  }}
-                  className="top-[0.05em] hover:bg-transparent inline-flex items-center justify-center w-[0.9em] h-[0.9em] rounded-full transition-all duration-200 hover:scale-105 relative cursor-pointer"
-                  aria-label={`Switch to ${theme === "light" ? "dark" : "light"} mode`}
-                >
-                  <motion.div
-                    key={theme}
-                    initial={{ scale: 0, rotate: -180 }}
-                    animate={{ scale: 1, rotate: 0 }}
-                    exit={{ scale: 0, rotate: 180 }}
-                    transition={{ duration: 0.2 }}
-                    className="flex items-center justify-center"
-                  >
-                    {theme === "light" ? (
-                      <Sun className="w-[0.8em] h-[0.8em] text-foreground hover:text-primary " strokeWidth={1} />
-                    ) : (
-                      <MoonIcon className="w-[0.8em] h-[0.8em] text-foreground hover:text-primary " />
-                    )}
-                  </motion.div>
-                </button>
-                M
-              </h1>
+          <div className="flex items-center justify-between h-16 md:h-20">
+            {/* Logo */}
+            <Link href="/" className="flex-shrink-0">
+              <Logo
+                variant="header"
+                width={160}
+                height={40}
+                className="h-8 md:h-10 w-auto"
+              />
             </Link>
 
-            {/* Hamburger Menu Button - Absolute Positioned on Right */}
-            <button
-              onClick={() => setMenuOpen(true)}
-              className="absolute top-6 right-0 w-12 h-12 md:w-16 md:h-16 bg-foreground rounded-full flex items-center justify-center hover:bg-primary hover:text-primary-dark transition-colors duration-150"
-              aria-label="Toggle menu"
-            >
-              <Menu className="w-6 h-6 md:w-8 md:h-8 text-background" />
-            </button>
+            {/* Desktop Navigation - Hidden on Mobile */}
+            <nav className="hidden lg:flex items-center gap-1">
+              {mainLinks.map((link) => {
+                const active = isActive(link.href);
+                return (
+                  <Link
+                    key={link.href}
+                    href={link.href}
+                    className={`relative px-4 py-2 text-sm font-medium transition-colors duration-150 group ${
+                      active
+                        ? getSportAccentClass(link.color, true) + " font-semibold"
+                        : "text-secondary hover:text-foreground"
+                    }`}
+                  >
+                    {link.label}
+                    {active && (
+                      <motion.div
+                        layoutId="activeTab"
+                        className={`absolute bottom-0 left-0 right-0 h-0.5 ${
+                          link.color === "basketball"
+                            ? "bg-[#D97B34]"
+                            : link.color === "football"
+                              ? "bg-[#2d5a3d] dark:bg-[#4c8a5f]"
+                              : link.color === "lacrosse"
+                                ? "bg-[#1e3a5f] dark:bg-[#4a6b9e]"
+                                : "bg-primary"
+                        }`}
+                        transition={{ type: "spring", stiffness: 500, damping: 30 }}
+                      />
+                    )}
+                  </Link>
+                );
+              })}
+            </nav>
+
+            {/* Right Side Actions */}
+            <div className="flex items-center gap-2">
+              {/* Theme Toggle */}
+              <button
+                onClick={toggleTheme}
+                className="flex items-center justify-center w-10 h-10 rounded-full hover:bg-muted/20 transition-colors duration-150"
+                aria-label={`Switch to ${theme === "light" ? "dark" : "light"} mode`}
+              >
+                <motion.div
+                  key={theme}
+                  initial={{ scale: 0, rotate: -180 }}
+                  animate={{ scale: 1, rotate: 0 }}
+                  transition={{ duration: 0.2 }}
+                >
+                  {theme === "light" ? (
+                    <div
+                      className="w-5 h-5 rounded-full"
+                      style={{
+                        background:
+                          "linear-gradient(to top, #fef3c7 0%, #fde68a 50%, #fcd34d 100%)",
+                      }}
+                    />
+                  ) : (
+                    <MoonIcon className="w-5 h-5 text-foreground" />
+                  )}
+                </motion.div>
+              </button>
+
+              {/* Mobile Menu Button */}
+              <button
+                onClick={() => setMenuOpen(!menuOpen)}
+                className="lg:hidden flex items-center justify-center w-10 h-10 rounded hover:bg-muted/20 transition-colors duration-150"
+                aria-label="Toggle menu"
+              >
+                {menuOpen ? (
+                  <X className="w-5 h-5 text-foreground" />
+                ) : (
+                  <Menu className="w-5 h-5 text-foreground" />
+                )}
+              </button>
+            </div>
           </div>
         </div>
-      </header>
+      </motion.header>
 
-      {/* Side Sheet Menu */}
-      <Sheet open={menuOpen} onOpenChange={setMenuOpen}>
-        <SheetContent side="right" className="w-full sm:max-w-md">
-          <SheetHeader>
-            <SheetTitle className="text-left font-display text-2xl">
-              Navigation
-            </SheetTitle>
-          </SheetHeader>
+      {/* Mobile Fullscreen Menu */}
+      <AnimatePresence>
+        {menuOpen && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.2 }}
+            className="fixed inset-0 z-40 lg:hidden"
+            onClick={() => setMenuOpen(false)}
+          >
+            <motion.div
+              initial={{ x: "100%" }}
+              animate={{ x: 0 }}
+              exit={{ x: "100%" }}
+              transition={{ type: "spring", stiffness: 300, damping: 30 }}
+              className="absolute right-0 top-16 md:top-20 bottom-0 w-full max-w-sm bg-card border-l border-border shadow-2xl overflow-y-auto"
+              onClick={(e) => e.stopPropagation()}
+            >
+              <div className="p-6">
+                {/* Main Navigation */}
+                <nav className="space-y-1">
+                  <div className="text-xs font-semibold text-muted uppercase tracking-wider mb-3">
+                    Coverage
+                  </div>
+                  {mainLinks.map((link) => {
+                    const active = isActive(link.href);
+                    return (
+                      <Link
+                        key={link.href}
+                        href={link.href}
+                        onClick={() => setMenuOpen(false)}
+                        className={`group flex items-center justify-between px-4 py-3 rounded-lg font-medium transition-all duration-150 ${
+                          active
+                            ? "bg-primary/10 " + getSportAccentClass(link.color, true)
+                            : "hover:bg-muted/10 text-foreground"
+                        }`}
+                      >
+                        <span className="text-base">{link.label}</span>
+                        {active && (
+                          <motion.span
+                            layoutId="activeDot"
+                            className={`w-2 h-2 rounded-full ${
+                              link.color === "basketball"
+                                ? "bg-[#D97B34]"
+                                : link.color === "football"
+                                  ? "bg-[#2d5a3d] dark:bg-[#4c8a5f]"
+                                  : link.color === "lacrosse"
+                                    ? "bg-[#1e3a5f] dark:bg-[#4a6b9e]"
+                                    : "bg-primary"
+                            }`}
+                            transition={{ type: "spring", stiffness: 500, damping: 30 }}
+                          />
+                        )}
+                      </Link>
+                    );
+                  })}
+                </nav>
 
-          <div className="mt-8 flex flex-col gap-8">
-            {/* Main Navigation */}
-            <nav className="flex flex-col gap-2">
-              <div className="text-xs font-semibold text-muted uppercase tracking-wide mb-2">
-                Sections
+                {/* Utility Links */}
+                <nav className="mt-8 space-y-1 pt-6 border-t border-border">
+                  <div className="text-xs font-semibold text-muted uppercase tracking-wider mb-3">
+                    More
+                  </div>
+                  {utilityLinks.map((link) => {
+                    const active = isActive(link.href);
+                    return (
+                      <Link
+                        key={link.href}
+                        href={link.href}
+                        onClick={() => setMenuOpen(false)}
+                        className={`group flex items-center justify-between px-4 py-3 rounded-lg font-medium transition-all duration-150 ${
+                          active
+                            ? "bg-primary/10 text-primary"
+                            : "hover:bg-muted/10 text-secondary"
+                        }`}
+                      >
+                        <span className="text-sm">{link.label}</span>
+                      </Link>
+                    );
+                  })}
+                </nav>
               </div>
-              {mainLinks.map((link) => (
-                <Link
-                  key={link.href}
-                  href={link.href}
-                  onClick={() => setMenuOpen(false)}
-                  className={`group flex items-center justify-between px-4 py-3 rounded-lg font-medium transition-all duration-150 ${
-                    isActive(link.href)
-                      ? "bg-primary text-primary-dark"
-                      : "hover:bg-muted/10 text-foreground"
-                  }`}
-                >
-                  <span className="text-base">{link.label}</span>
-                  {isActive(link.href) && (
-                    <span className="w-2 h-2 rounded-full bg-primary-dark" />
-                  )}
-                </Link>
-              ))}
-            </nav>
-
-            {/* Utility Links */}
-            <nav className="flex flex-col gap-2 pt-6 border-t border-border">
-              <div className="text-xs font-semibold text-muted uppercase tracking-wide mb-2">
-                More
-              </div>
-              {utilityLinks.map((link) => (
-                <Link
-                  key={link.href}
-                  href={link.href}
-                  onClick={() => setMenuOpen(false)}
-                  className={`group flex items-center justify-between px-4 py-3 rounded-lg font-medium transition-all duration-150 ${
-                    isActive(link.href)
-                      ? "bg-primary/10 text-primary"
-                      : "hover:bg-muted/10 text-foreground"
-                  }`}
-                >
-                  <span className="text-sm">{link.label}</span>
-                  {isActive(link.href) && (
-                    <span className="w-2 h-2 rounded-full bg-primary" />
-                  )}
-                </Link>
-              ))}
-            </nav>
-          </div>
-        </SheetContent>
-      </Sheet>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </>
   );
 }

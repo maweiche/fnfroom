@@ -40,7 +40,7 @@ export default async function ConversationPage({
   const { id } = await params;
 
   if (!auth) {
-    redirect('/login?redirect=/pressbox');
+    redirect('/pressbox/login?redirect=/pressbox');
   }
 
   const conversation = await getConversation(id, auth.token);
@@ -58,6 +58,7 @@ export default async function ConversationPage({
         awayTeam: conversation.awayTeam,
         sport: conversation.sport,
       }}
+      token={auth.token}
     />
   );
 }

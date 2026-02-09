@@ -71,20 +71,20 @@ export default async function ArticlePage({ params }: ArticlePageProps) {
   const relatedArticles = await getRelatedArticles(article.sport, article._id);
 
   const imageUrl = article.featuredImage
-    ? urlFor(article.featuredImage).width(1920).height(1080).url()
+    ? urlFor(article.featuredImage).width(1600).height(1200).url()
     : null;
 
   return (
     <article className="min-h-screen">
       {/* Hero Section */}
-      <header className="relative h-[400px] md:h-[500px] bg-gradient-to-br from-slate-200 to-slate-300 dark:from-slate-700 dark:to-slate-800">
+      <header className="relative aspect-[4/3] w-full bg-black">
         {imageUrl && (
           <Image
             src={imageUrl}
             alt={article.featuredImage?.alt || article.title}
             fill
             sizes="100vw"
-            className="object-cover"
+            className="object-contain"
             priority
           />
         )}

@@ -7,11 +7,11 @@ import { urlFor } from "@/sanity/lib/image";
 import type { Article } from "@/lib/sanity.types";
 
 interface HeroGridProps {
-  featuredArticle?: Article;
+  featuredArticles?: Article[];
   featuredVideoPlaybackId?: string;
 }
 
-export async function HeroGrid({ featuredArticle, featuredVideoPlaybackId }: HeroGridProps) {
+export async function HeroGrid({ featuredArticles = [], featuredVideoPlaybackId }: HeroGridProps) {
   // Fetch top matchups for Games of the Week
   let topGames: Array<{
     id: string;
@@ -49,52 +49,22 @@ export async function HeroGrid({ featuredArticle, featuredVideoPlaybackId }: Her
   return (
     <section className="container mx-auto px-4 pt-0 pb-8 md:pb-12 flex-1 flex items-stretch">
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4 w-full">
-        {/* Featured Article - Large Left Column (2/3 width on desktop) */}
-        {featuredArticle ? (
-          <Link
-            href={`/${featuredArticle.sport}/${featuredArticle.slug.current}`}
-            className="md:col-span-2 relative overflow-hidden rounded-lg bg-card shadow-card hover:shadow-card-hover transition-shadow duration-200 group h-full"
-          >
-            {featuredArticle.featuredImage && (
-              <div className="relative h-full min-h-[400px] md:min-h-[500px] overflow-hidden">
-                <Image
-                  src={urlFor(featuredArticle.featuredImage).width(1200).height(675).url()}
-                  alt={featuredArticle.featuredImage.alt || featuredArticle.title}
-                  fill
-                  className="object-cover group-hover:scale-105 transition-transform duration-300"
-                  priority
-                />
-                <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent" />
-                <div className="absolute bottom-0 left-0 right-0 p-6 md:p-8">
-                  <SportTag sport={featuredArticle.sport} />
-                  <h2 className="font-display font-bold text-2xl md:text-4xl text-white mt-3 leading-tight">
-                    {featuredArticle.title}
-                  </h2>
-                  <div className="flex items-center gap-3 mt-4 text-sm text-white/90">
-                    <span className="font-medium">{featuredArticle.author.name}</span>
-                    <span>•</span>
-                    <time>
-                      {new Date(featuredArticle.publishDate).toLocaleDateString("en-US", {
-                        month: "short",
-                        day: "numeric",
-                      })}
-                    </time>
-                  </div>
-                </div>
-              </div>
-            )}
-          </Link>
-        ) : (
-          <div className="md:col-span-2 rounded-lg bg-muted/10 h-full min-h-[400px] md:min-h-[500px] flex items-center justify-center">
-            <p className="text-muted">No featured article</p>
-          </div>
-        )}
+        {/* Left Column - 2 Featured Articles Stacked (2/3 width on desktop) */}
+        <div className="md:col-span-2 flex flex-col gap-4">
+          {featuredArticles.slice(0, 2).reverse().map((article, index) => (
+            <FeaturedArticleCard
+              key={article._id}
+              article={article}
+              priority={index === 0}
+            />
+          ))}
+        </div>
 
         {/* Right Column - Video Player + Games of Week */}
         <div className="flex flex-col gap-4 h-full">
           {/* Mux Video Player - Top Right (16:9 aspect ratio) */}
           <div className="relative rounded-lg overflow-hidden shadow-card bg-black aspect-video">
-            {featuredVideoPlaybackId ? (
+            {/* {featuredVideoPlaybackId ? (
               <MuxPlayer
                 playbackId={featuredVideoPlaybackId}
                 accentColor="#94d873"
@@ -104,7 +74,8 @@ export async function HeroGrid({ featuredArticle, featuredVideoPlaybackId }: Her
               <div className="flex items-center justify-center h-full">
                 <p className="text-white/60 text-sm">No featured video</p>
               </div>
-            )}
+            )} */}
+            <video src="/motion_logo.mp4" className="w-full h-full" autoPlay muted loop />
           </div>
 
           {/* Games of the Week Card - Bottom Right (takes remaining space) */}
@@ -114,6 +85,50 @@ export async function HeroGrid({ featuredArticle, featuredVideoPlaybackId }: Her
         </div>
       </div>
     </section>
+  );
+}
+
+// Featured Article Card Component
+interface FeaturedArticleCardProps {
+  article: Article;
+  priority?: boolean;
+}
+
+function FeaturedArticleCard({ article, priority = false }: FeaturedArticleCardProps) {
+  return (
+    <Link
+      href={`/${article.sport}/${article.slug.current}`}
+      className="relative overflow-hidden rounded-lg bg-black shadow-card hover:shadow-card-hover transition-shadow duration-200 group flex-1"
+    >
+      {article.featuredImage && (
+        <div className="relative w-full aspect-[16/9] overflow-hidden bg-black">
+          <Image
+            src={urlFor(article.featuredImage).width(1600).url()}
+            alt={article.featuredImage.alt || article.title}
+            fill
+            className="object-contain group-hover:scale-105 transition-transform duration-300"
+            priority={priority}
+          />
+          <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent pointer-events-none" />
+          <div className="absolute bottom-0 left-0 right-0 p-4 md:p-6">
+            <SportTag sport={article.sport} />
+            <h2 className="font-display font-bold text-xl md:text-2xl text-white mt-2 leading-tight line-clamp-2">
+              {article.title}
+            </h2>
+            <div className="flex items-center gap-3 mt-3 text-sm text-white/90">
+              <span className="font-medium">{article.author.name}</span>
+              <span>•</span>
+              <time>
+                {new Date(article.publishDate).toLocaleDateString("en-US", {
+                  month: "short",
+                  day: "numeric",
+                })}
+              </time>
+            </div>
+          </div>
+        </div>
+      )}
+    </Link>
   );
 }
 

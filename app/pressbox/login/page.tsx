@@ -2,6 +2,7 @@
 
 import { useState, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
+import { Logo } from '@/components/logo';
 
 function LoginForm() {
   const [email, setEmail] = useState('');
@@ -48,6 +49,9 @@ function LoginForm() {
       <div className="w-full max-w-md">
         <div className="bg-card border rounded-lg p-8 shadow-sm">
           <div className="text-center mb-8">
+            <div className="flex justify-center mb-6">
+              <Logo variant="full" width={280} height={70} href="/" />
+            </div>
             <h1 className="text-3xl font-bold mb-2">Press Box AI</h1>
             <p className="text-muted-foreground">Sign in to start writing</p>
           </div>

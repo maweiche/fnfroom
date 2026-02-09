@@ -1,83 +1,89 @@
 # Design System: Friday Night Film Room
 
 **Created**: 2026-02-07
-**Last Updated**: 2026-02-08
-**Direction**: Precision & Credibility (Sports Editorial Authority)
+**Last Updated**: 2026-02-09
+**Direction**: Cinematic Sports Authority (Friday Night Lights)
 
 ## Design Direction
 
 ### Core Personality
-Professional sports news outlet. Information-dense, credible, editorial polish with sports energy. Think ESPN local meets Linear's precision.
+Cinematic sports journalism under the lights. Warm stadium spotlights meet vintage film aesthetic. Athletic, authoritative, nostalgic. Think Friday night stadium atmosphere with film noir sports photography.
 
 ### Color Foundation
-Dark navy header (#1a1d29), clean white/light gray content backgrounds (#ffffff, #f8f9fa), bold sport-specific accents.
+Deep charcoal black (#1a1612) primary background, warm spotlight gold (#D4A574) for drama, cream highlights (#F5E6D3) for text. Cinematic depth through warm tones and dramatic contrast.
 
 ### Mode Preference
-Light primary (optimized for article reading), dark mode full support for night reading.
+**Dark-first design** (primary experience matching logo's nighttime stadium aesthetic), light mode available for article reading. Dark mode is the hero experience.
 
 ### Accent Strategy
-Four-color system:
-- **Primary brand**: #94d873 (brand green, used for CTAs and primary actions)
-- **Basketball**: #E67E22 (orange, sport tag and basketball-specific UI)
-- **Football**: #27AE60 (green, sport tag and football-specific UI)
-- **Lacrosse**: #2980B9 (blue, sport tag and lacrosse-specific UI)
+Warm cinematic palette:
+- **Primary brand**: #D4A574 (warm spotlight gold, used prominently for CTAs, hero moments, key actions)
+- **Basketball**: #D97B34 (deep burnt orange, warmer than previous)
+- **Football**: #2d5a3d (deep forest green, darker and more cinematic)
+- **Lacrosse**: #1e3a5f (deep navy blue, less bright, more sophisticated)
 
 ### Layout Approach
 Dense card grids, editorial two-column layouts, table-heavy (rankings/stats), mobile-first responsive.
 
 ### Typography System
-- **Display**: Space Grotesk (700-800 weight) for headlines — Athletic, geometric, bold, distinctive
-- **Body**: Inter (400-500 weight) for article text — highly readable
+- **Display**: Space Grotesk (800 weight) for headlines — Bold, athletic, dramatic contrast with body text. Matches logo's condensed bold typography
+- **Body**: Inter (400 weight) for article text — Maximum contrast with headlines, highly readable
+- **Emphasis**: Inter (500 weight) for labels, navigation, UI elements
 - **Data**: JetBrains Mono (tabular numerals) for stats, scores, rankings
+- **Warm text colors**: Use cream tones (#F5E6D3) for text on dark backgrounds instead of pure white
 
 ### Depth Strategy
-**Subtle shadows on cards** — Gentle lift for content cards (articles, videos, players) to create hierarchy. Borders for tables and data displays. Matches ESPN/MaxPreps pattern while maintaining clean information density.
+**Cinematic spotlight shadows** — Dark mode uses warm glow effects to simulate stadium lighting. Light mode uses subtle warm shadows. Cards lift with golden spotlight glow on hover. Hero sections get dramatic spotlight effects. Tables and data use subtle borders for clean information density.
+
+### Background Texture
+**Carbon fiber pattern (dark mode only)** — Athletic high-performance aesthetic with diagonal woven texture. Adds depth and sophistication without interfering with content readability. Light mode uses subtle gradient for clean reading experience.
 
 ## Design Tokens
 
 ### Core Colors
 | Variable | Light | Dark | Usage |
 |----------|-------|------|-------|
-| `--background` | #fbfbfa | #272729 | Page background (slight warmth/cool) |
-| `--foreground` | #171717 | #fbfbfa | Primary text |
-| `--primary` | #94d873 | #94d873 | Brand accent, CTAs |
-| `--primary-dark` | #003d00 | #306332 | Primary text on primary bg |
-| `--primary-light` | #e1f8d8 | #2d4a25 | Subtle green backgrounds |
-| `--secondary` | #212121 | #f0f0f0 | Secondary text |
-| `--muted` | #737373 | #a6a6a6 | Muted text, placeholders |
-| `--card` | #ffffff | #333333 | Card backgrounds (elevated) |
-| `--border` | #e6e6e6 | #404040 | Neutral borders |
+| `--background` | #fbfbfa | #1D1A10 | Page background (light off-white / dark warm charcoal) |
+| `--foreground` | #171717 | #F7EED9 | Primary text (dark / warm cream) |
+| `--primary` | #E6BC6A | #E6BC6A | True golden spotlight (used prominently) |
+| `--primary-dark` | #99863D | #99863D | Darker gold for contrast needs |
+| `--primary-light` | #F7EED9 | #453B1C | Cream highlight / dark gold tint |
+| `--secondary` | #595959 | #b8a898 | Secondary text (warm gray tones) |
+| `--muted` | #737373 | #8a7d6f | Muted text, placeholders (warm neutrals) |
+| `--card` | #ffffff | #242118 | Card backgrounds (white / dark warm charcoal) |
+| `--border` | #e6e6e6 | #3d3830 | Neutral borders (warm-tinted) |
 
-### Sport-Specific Colors
+### Sport-Specific Colors (Cinematic Palette)
 | Variable | Hex | Usage |
 |----------|-----|-------|
-| `--basketball` | #E67E22 | Basketball sport tags, accents |
-| `--football` | #27AE60 | Football sport tags, accents |
-| `--lacrosse` | #2980B9 | Lacrosse sport tags, accents |
+| `--basketball` | #D97B34 | Deep burnt orange (warmer, more dramatic) |
+| `--football` | #2d5a3d | Deep forest green (darker, cinematic) |
+| `--lacrosse` | #1e3a5f | Deep navy blue (sophisticated, muted) |
 
 ### Semantic Colors
 | Variable | Light | Dark | Usage |
 |----------|-------|------|-------|
-| `--success` | #83c961 | #4c7a4c | Success states, wins |
-| `--error` | #f7604c | #ffb3b3 | Error states, losses |
-| `--warning` | #f78535 | #f7c6a0 | Warning states |
-| `--info` | #4864d2 | #c2d4e6 | Info, links |
-| `--navy-header` | #1a1d29 | #212121 | Site header background |
+| `--success` | #7a9b5f | #6b8a50 | Muted olive green for wins |
+| `--error` | #d9534f | #d9534f | Warm red for losses |
+| `--warning` | #D97B34 | #D97B34 | Warm orange warnings |
+| `--info` | #5a7a9e | #7a9abe | Muted blue for info |
+| `--charcoal-black` | #1a1612 | #1a1612 | Deep charcoal (site header, dark sections) |
 
 ### Custom Brand Accents
 | Variable | Light | Dark | Usage |
 |----------|-------|------|-------|
-| `--cloud-gray` | #f1f0ee | #333333 | Soft backgrounds |
-| `--charcoal` | #212121 | #212121 | Brand dark accent |
-| `--meadow` | #94d873 | #94d873 | Brand green accent |
-| `--pearl` | #fbfbfa | #404040 | Brand light accent |
+| `--spotlight-gold` | #E6BC6A | #E6BC6A | Main accent (true golden spotlight) |
+| `--warm-cream` | #F7EED9 | #F7EED9 | Highlights on dark backgrounds |
+| `--film-gray` | #8a8a8a | #8a8a8a | Neutral elements (camera equipment aesthetic) |
+| `--charcoal` | #1D1A10 | #1D1A10 | Brand dark accent |
+| `--pearl` | #fbfbfa | #33300E | Brand light accent |
 
-### Tinted Card Backgrounds
+### Tinted Card Backgrounds (Warm Palette)
 | Variable | Value | Usage |
 |----------|-------|-------|
-| `--card-mint` | #f5fdf2 (light) / #26332a (dark) | Green-tinted cards |
-| `--card-peach` | #fff5f0 (light) / #3d2e28 (dark) | Warm accent cards |
-| `--card-sky` | #f0f7ff (light) / #26303d (dark) | Blue-tinted cards |
+| `--card-gold` | #FBF9F0 (light) / #453B1C (dark) | Warm gold-tinted cards |
+| `--card-rust` | #faf3ed (light) / #3d2e28 (dark) | Burnt orange-tinted cards |
+| `--card-forest` | #f2f5f3 (light) / #26332a (dark) | Dark green-tinted cards |
 
 ### Spacing Scale
 Base: 4px grid
@@ -112,12 +118,44 @@ Sharp system: 4-8px (editorial precision)
 - `4xl`: 48px (hero headlines)
 - `5xl`: 56px (featured article headlines)
 
-### Shadows
+### Shadows (Cinematic Warm Glow)
 ```css
---shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
---shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
---shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+/* Light mode - subtle warm shadows */
+--shadow-sm: 0 1px 2px 0 rgba(26, 22, 18, 0.08);
+--shadow-md: 0 4px 8px -2px rgba(26, 22, 18, 0.12), 0 2px 4px -1px rgba(26, 22, 18, 0.08);
+--shadow-lg: 0 10px 20px -5px rgba(26, 22, 18, 0.15), 0 4px 8px -2px rgba(26, 22, 18, 0.1);
+
+/* Dark mode - spotlight glow effects */
+--shadow-warm: 0 4px 12px rgba(212, 165, 116, 0.15);
+--glow-spotlight: 0 0 24px rgba(212, 165, 116, 0.25), 0 0 48px rgba(212, 165, 116, 0.1);
+--glow-hero: 0 8px 32px rgba(212, 165, 116, 0.3);
 ```
+
+## Carbon Fiber Texture Utilities
+
+Apply to elements for athletic depth and texture:
+
+### Body Background (Automatic)
+- **Dark mode**: Full carbon fiber weave pattern
+- **Light mode**: Subtle gradient background
+
+### Utility Classes
+```tsx
+// Strong carbon fiber texture
+<div className="carbon-fiber-bg">
+
+// Subtle carbon fiber (less prominent)
+<div className="carbon-fiber-subtle">
+
+// Card-specific carbon fiber with blend mode
+<Card className="carbon-fiber-card">
+```
+
+**Usage Notes**:
+- Carbon fiber auto-applies to body in dark mode
+- Use utilities sparingly on hero sections or feature cards
+- Don't apply to content-heavy reading areas (articles)
+- Works best on dark backgrounds
 
 ## Component Patterns
 
@@ -155,7 +193,7 @@ Sharp system: 4-8px (editorial precision)
 
 ### Hero Article
 ```tsx
-<section className="relative h-[500px] md:h-[600px]">
+<section className="relative aspect-[4/3] w-full">
   <Image className="absolute inset-0 object-cover" />
   <div className="absolute inset-0 bg-gradient-to-t from-black/80 to-transparent" />
   <div className="absolute bottom-0 p-6 md:p-8 text-white">
@@ -170,35 +208,53 @@ Sharp system: 4-8px (editorial precision)
   </div>
 </section>
 ```
-- Height: 500px mobile, 600px desktop
+- **Aspect ratio**: 4:3 (matches uploaded image dimensions of 1000×750px)
+- **Image dimensions**: Request at 1000×750px to prevent cropping
 - Gradient overlay: Bottom-heavy for text readability
 - Typography: 48px mobile, 56px desktop headline
 - Padding: 24px mobile, 32px desktop
 
+### Logo Component
+```tsx
+import { Logo } from '@/components/logo';
+
+// Header variant - Optimized for navigation
+<Logo variant="header" width={200} height={50} />
+
+// Full variant - For footer, login pages, hero sections
+<Logo variant="full" width={280} height={70} />
+
+// With custom link
+<Logo variant="header" href="/" />
+
+// Footer usage (white logo on dark)
+<Logo variant="full" className="brightness-0 invert" />
+```
+- Files: `/public/fnfr-logo-header.png`, `/public/fnfr-logo.png`
+- Header dimensions: 200-240px width, 50-60px height
+- Full dimensions: 280-320px width, 70-80px height
+- Always use priority loading for above-the-fold logos
+- Footer: Apply `brightness-0 invert` for white logo on dark backgrounds
+
 ### Navigation
 ```tsx
-<nav className="sticky top-0 z-50 bg-navy-header border-b border-border/10">
+<nav className="sticky top-0 z-40 bg-background/95 backdrop-blur-sm border-b border-border">
   <div className="container mx-auto px-4">
-    <div className="flex items-center justify-between h-16">
-      <Logo />
-      <div className="hidden md:flex items-center gap-6 text-sm font-medium text-white">
-        <Link>Basketball</Link>
-        <Link>Football</Link>
-        <Link>Lacrosse</Link>
-        <Link>Video</Link>
-        <Link>Rankings</Link>
-        <Link>Recruiting</Link>
+    <div className="flex items-center justify-between h-20 md:h-24">
+      <Logo variant="header" width={200} height={50} />
+      <div className="flex items-center gap-3">
+        <ThemeToggle />
+        <MenuButton />
       </div>
-      <SearchIcon />
     </div>
   </div>
 </nav>
 ```
-- Background: Navy (#1a1d29)
-- Height: 64px
-- Text: White, 14px, 500 weight
-- Sticky positioning
-- Border bottom: Subtle white/10 opacity
+- Background: Semi-transparent with backdrop blur
+- Height: 80px mobile, 96px desktop
+- Sticky positioning for persistent header
+- Logo: Header variant, responsive sizing
+- Border bottom: Subtle separator
 
 ### Rankings Table
 ```tsx

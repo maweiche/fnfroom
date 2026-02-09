@@ -19,12 +19,14 @@ interface ConversationInterfaceProps {
     awayTeam: string;
     sport: string;
   };
+  token: string;
 }
 
 export function ConversationInterface({
   conversationId,
   initialTranscript = [],
-  gameInfo
+  gameInfo,
+  token
 }: ConversationInterfaceProps) {
   const [messages, setMessages] = useState<Message[]>(initialTranscript);
   const [isLoading, setIsLoading] = useState(false);
@@ -51,11 +53,6 @@ export function ConversationInterface({
     setIsLoading(true);
 
     try {
-      const token = localStorage.getItem('token');
-      if (!token) {
-        setError('Not authenticated. Please log in.');
-        return;
-      }
 
       const response = await fetch('/api/pressbox/message', {
         method: 'POST',
@@ -95,11 +92,6 @@ export function ConversationInterface({
     setError('');
 
     try {
-      const token = localStorage.getItem('token');
-      if (!token) {
-        setError('Not authenticated. Please log in.');
-        return;
-      }
 
       const response = await fetch('/api/pressbox/generate', {
         method: 'POST',

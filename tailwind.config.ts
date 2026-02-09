@@ -33,9 +33,10 @@ const config: Config = {
   			card: {
   				DEFAULT: 'hsl(var(--card))',
   				foreground: 'hsl(var(--card-foreground))',
-  				mint: 'hsl(var(--card-mint))',
-  				peach: 'hsl(var(--card-peach))',
-  				sky: 'hsl(var(--card-sky))'
+  				gold: 'hsl(var(--card-gold))',
+  				rust: 'hsl(var(--card-rust))',
+  				forest: 'hsl(var(--card-forest))',
+  				mint: 'hsl(var(--card-mint))'
   			},
   			border: 'hsl(var(--border))',
   			input: 'hsl(var(--input))',
@@ -47,13 +48,13 @@ const config: Config = {
   			error: 'hsl(var(--error))',
   			warning: 'hsl(var(--warning))',
   			info: 'hsl(var(--info))',
-  			'cloud-gray': 'hsl(var(--cloud-gray))',
-  			charcoal: 'hsl(var(--charcoal))',
-  			meadow: 'hsl(var(--meadow))',
+  			'spotlight-gold': 'hsl(var(--spotlight-gold))',
+  			'warm-cream': 'hsl(var(--warm-cream))',
+  			'film-gray': 'hsl(var(--film-gray))',
+  			'charcoal-black': 'hsl(var(--charcoal-black))',
   			pearl: 'hsl(var(--pearl))',
-  			navy: {
-  				header: 'hsl(var(--navy-header))'
-  			},
+  			'cloud-gray': 'hsl(var(--cloud-gray))',
+  			'navy-header': 'hsl(var(--navy-header))',
   			popover: {
   				DEFAULT: 'hsl(var(--popover))',
   				foreground: 'hsl(var(--popover-foreground))'
@@ -103,11 +104,13 @@ const config: Config = {
   			'3xl': '64px'
   		},
   		boxShadow: {
-  			sm: '0 1px 2px 0 rgba(0, 0, 0, 0.05)',
-  			md: '0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)',
-  			lg: '0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05)',
-  			card: '0 2px 8px -2px rgba(0, 0, 0, 0.12), 0 1px 4px -1px rgba(0, 0, 0, 0.08)',
-  			'card-hover': '0 8px 16px -4px rgba(0, 0, 0, 0.16), 0 4px 8px -2px rgba(0, 0, 0, 0.12)'
+  			sm: '0 1px 2px 0 rgba(26, 22, 18, 0.08)',
+  			md: '0 4px 8px -2px rgba(26, 22, 18, 0.12), 0 2px 4px -1px rgba(26, 22, 18, 0.08)',
+  			lg: '0 10px 20px -5px rgba(26, 22, 18, 0.15), 0 4px 8px -2px rgba(26, 22, 18, 0.1)',
+  			card: '0 2px 8px -2px rgba(26, 22, 18, 0.12), 0 1px 4px -1px rgba(26, 22, 18, 0.08)',
+  			'card-hover': '0 8px 16px -4px rgba(26, 22, 18, 0.16), 0 4px 8px -2px rgba(26, 22, 18, 0.12)',
+  			'glow-spotlight': '0 0 24px rgba(212, 165, 116, 0.25), 0 0 48px rgba(212, 165, 116, 0.1)',
+  			'glow-hero': '0 8px 32px rgba(212, 165, 116, 0.3), 0 0 64px rgba(212, 165, 116, 0.15)'
   		},
   		typography: {
   			xs: '11px',

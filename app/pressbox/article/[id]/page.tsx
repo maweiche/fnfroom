@@ -40,7 +40,7 @@ export default async function ArticlePage({
   const { id } = await params;
 
   if (!auth) {
-    redirect('/login?redirect=/pressbox');
+    redirect('/pressbox/login?redirect=/pressbox');
   }
 
   const article = await getArticle(id, auth.token);
@@ -49,5 +49,5 @@ export default async function ArticlePage({
     redirect('/pressbox');
   }
 
-  return <ArticleEditor article={article} />;
+  return <ArticleEditor article={article} token={auth.token} />;
 }

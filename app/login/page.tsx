@@ -3,6 +3,7 @@
 import { useState, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useAuth } from '@/lib/auth-context';
+import { Logo } from '@/components/logo';
 
 function LoginForm() {
   const router = useRouter();
@@ -36,7 +37,10 @@ function LoginForm() {
       <div className="max-w-md w-full">
         {/* Header */}
         <div className="text-center mb-8">
-          <h1 className="text-4xl font-bold text-gray-900 mb-2">
+          <div className="flex justify-center mb-6">
+            <Logo variant="full" width={280} height={70} href="/" />
+          </div>
+          <h1 className="text-3xl font-bold text-gray-900 mb-2">
             🏀 ScoreSnap
           </h1>
           <p className="text-lg text-gray-600">

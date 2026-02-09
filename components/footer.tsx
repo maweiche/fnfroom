@@ -1,14 +1,17 @@
 import Link from "next/link";
 import { Twitter, Instagram } from "lucide-react";
+import { Logo } from "./logo";
 
 export function Footer() {
   return (
-    <footer className="bg-navy-header text-white border-t border-white/10 mt-16">
+    <footer className="bg-charcoal-black text-warm-cream border-t border-warm-cream/10 mt-16">
       <div className="container mx-auto px-4 py-12">
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
           {/* Column 1: Logo & Social */}
           <div>
-            <div className="font-bold text-lg mb-2">Friday Night Film Room</div>
+            <div className="mb-4">
+              <Logo variant="full" width={240} height={60} href="/" className="brightness-0 invert" />
+            </div>
             <p className="text-sm text-white/70 mb-4">
               NC high school sports coverage
             </p>
