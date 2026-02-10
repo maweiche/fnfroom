@@ -41,8 +41,7 @@ export function ScoreStreamWidget({
 
   return (
     <div
-      className={`w-full bg-card border-b border-border overflow-hidden ${className}`}
-      style={{ height: "70px" }}
+      className={`w-full h-[90px] bg-card border-b border-border overflow-hidden ${className}`}
     >
         <div
           ref={containerRef}
