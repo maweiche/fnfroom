@@ -90,61 +90,61 @@ export default async function BeerCoolerPage() {
                   Featured Story
                 </span>
               </div>
-              <Link href={`/beer-cooler/${update.slug}`} className="group">
+              <Link href={`/beer-cooler/${update.slug}`} className="group block">
                 <h2 className="text-3xl md:text-4xl font-bold text-foreground mb-4 group-hover:text-primary transition-colors">
                   {update.title}
                 </h2>
-              </Link>
-              <div className="flex flex-wrap items-center gap-4 text-sm text-secondary mb-6">
-                <span className="flex items-center gap-1">
-                  <MapPin className="w-4 h-4" />
-                  {update.location}
-                </span>
-                <span className="flex items-center gap-1">
-                  <Clock className="w-4 h-4" />
-                  {new Date(update.gameDate).toLocaleDateString("en-US", {
-                    month: "long",
-                    day: "numeric",
-                    year: "numeric",
-                  })}
-                </span>
-                <span
-                  className="px-2 py-1 rounded text-xs font-medium text-white"
-                  style={{
-                    backgroundColor:
-                      SPORT_COLORS[update.sport as keyof typeof SPORT_COLORS],
-                  }}
-                >
-                  {update.sport.toUpperCase()}
-                </span>
-              </div>
-              {update.image && (
-                <div className="mb-6">
-                  <div className="relative w-full aspect-video rounded-lg overflow-hidden">
-                    <Image
-                      src={update.image}
-                      alt={update.title}
-                      fill
-                      className="object-cover"
-                    />
+                <div className="flex flex-wrap items-center gap-4 text-sm text-secondary mb-6">
+                  <span className="flex items-center gap-1">
+                    <MapPin className="w-4 h-4" />
+                    {update.location}
+                  </span>
+                  <span className="flex items-center gap-1">
+                    <Clock className="w-4 h-4" />
+                    {new Date(update.gameDate).toLocaleDateString("en-US", {
+                      month: "long",
+                      day: "numeric",
+                      year: "numeric",
+                    })}
+                  </span>
+                  <span
+                    className="px-2 py-1 rounded text-xs font-medium text-white"
+                    style={{
+                      backgroundColor:
+                        SPORT_COLORS[update.sport as keyof typeof SPORT_COLORS],
+                    }}
+                  >
+                    {update.sport.toUpperCase()}
+                  </span>
+                </div>
+                {update.image && (
+                  <div className="mb-6">
+                    <div className="relative w-full aspect-video rounded-lg overflow-hidden group-hover:opacity-90 transition-opacity">
+                      <Image
+                        src={update.image}
+                        alt={update.title}
+                        fill
+                        className="object-cover"
+                      />
+                    </div>
+                    {update.photographer && (
+                      <p className="text-xs text-muted mt-2">
+                        Photo by {update.photographer}
+                      </p>
+                    )}
                   </div>
-                  {update.photographer && (
-                    <p className="text-xs text-muted mt-2">
-                      Photo by {update.photographer}
+                )}
+                <p className="text-lg text-foreground leading-relaxed mb-6">
+                  {update.recap}
+                </p>
+                {update.stats && (
+                  <div className="p-4 rounded-lg bg-card border border-border">
+                    <p className="font-mono text-sm font-semibold text-foreground tabular-nums">
+                      {update.stats}
                     </p>
-                  )}
-                </div>
-              )}
-              <p className="text-lg text-foreground leading-relaxed mb-6">
-                {update.recap}
-              </p>
-              {update.stats && (
-                <div className="p-4 rounded-lg bg-card border border-border">
-                  <p className="font-mono text-sm font-semibold text-foreground tabular-nums">
-                    {update.stats}
-                  </p>
-                </div>
-              )}
+                  </div>
+                )}
+              </Link>
             </div>
           </div>
         </section>
