@@ -2,6 +2,7 @@
 
 import { motion } from "framer-motion";
 import Image from "next/image";
+import Link from "next/link";
 import { MapPin, Clock } from "lucide-react";
 
 const SPORT_COLORS = {
@@ -20,15 +21,17 @@ type BeerLeagueUpdate = {
   image: string | null;
   photographer: string | null;
   featured: boolean;
+  slug: string;
 };
 
 export function BeerLeagueCard({ update }: { update: BeerLeagueUpdate }) {
   return (
-    <motion.article
-      initial={{ opacity: 0, y: 20 }}
-      animate={{ opacity: 1, y: 0 }}
-      className="bg-card rounded-lg border border-border overflow-hidden hover:shadow-lg transition-shadow duration-200"
-    >
+    <Link href={`/beer-cooler/${update.slug}`} className="group block">
+      <motion.article
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        className="bg-card rounded-lg border border-border overflow-hidden hover:shadow-lg transition-shadow duration-200 h-full flex flex-col"
+      >
       {/* Sport Badge */}
       <div
         className="h-1"
@@ -77,7 +80,7 @@ export function BeerLeagueCard({ update }: { update: BeerLeagueUpdate }) {
         </div>
 
         {/* Title */}
-        <h3 className="text-lg font-bold text-foreground mb-2 line-clamp-2">
+        <h3 className="text-lg font-bold text-foreground mb-2 line-clamp-2 group-hover:text-primary transition-colors">
           {update.title}
         </h3>
 
@@ -106,5 +109,6 @@ export function BeerLeagueCard({ update }: { update: BeerLeagueUpdate }) {
         )}
       </div>
     </motion.article>
+    </Link>
   );
 }

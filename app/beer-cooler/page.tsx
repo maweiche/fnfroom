@@ -35,6 +35,7 @@ export default async function BeerCoolerPage() {
   const beerLeagueUpdates = beerCoolerArticles.map((article, index) => ({
     id: article._id,
     title: article.title,
+    slug: article.slug.current,
     league: "Triad Adult Lacrosse League",
     sport: "lacrosse" as const,
     location: "Triad, NC",
@@ -76,6 +77,7 @@ export default async function BeerCoolerPage() {
           </div>
         </div>
       </section>
+      
 
       {/* Featured Story */}
       {beerLeagueUpdates.length > 0 && beerLeagueUpdates.filter((u) => u.featured).map((update) => (
@@ -88,9 +90,11 @@ export default async function BeerCoolerPage() {
                   Featured Story
                 </span>
               </div>
-              <h2 className="text-3xl md:text-4xl font-bold text-foreground mb-4">
-                {update.title}
-              </h2>
+              <Link href={`/beer-cooler/${update.slug}`} className="group">
+                <h2 className="text-3xl md:text-4xl font-bold text-foreground mb-4 group-hover:text-primary transition-colors">
+                  {update.title}
+                </h2>
+              </Link>
               <div className="flex flex-wrap items-center gap-4 text-sm text-secondary mb-6">
                 <span className="flex items-center gap-1">
                   <MapPin className="w-4 h-4" />
@@ -146,29 +150,6 @@ export default async function BeerCoolerPage() {
         </section>
       ))}
 
-      {/* Recent Updates */}
-      <section className="py-12">
-        <div className="container mx-auto px-4 md:px-6">
-          <div className="flex items-center justify-between mb-8">
-            <h2 className="text-2xl md:text-3xl font-bold text-foreground">
-              Recent Games
-            </h2>
-          </div>
-
-          {beerLeagueUpdates.length > 0 ? (
-            <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-              {beerLeagueUpdates.map((update) => (
-                <BeerLeagueCard key={update.id} update={update} />
-              ))}
-            </div>
-          ) : (
-            <div className="text-center py-12">
-              <p className="text-secondary">No beer cooler articles found. Check back soon!</p>
-            </div>
-          )}
-        </div>
-      </section>
-
       {/* League Standings Preview */}
       <section className="py-12 bg-card/30">
         <div className="container mx-auto px-4 md:px-6">
@@ -205,6 +186,29 @@ export default async function BeerCoolerPage() {
               </table>
             </div>
           </div>
+        </div>
+      </section>
+
+      {/* Recent Updates */}
+      <section className="py-12">
+        <div className="container mx-auto px-4 md:px-6">
+          <div className="flex items-center justify-between mb-8">
+            <h2 className="text-2xl md:text-3xl font-bold text-foreground">
+              Recent Games
+            </h2>
+          </div>
+
+          {beerLeagueUpdates.length > 0 ? (
+            <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+              {beerLeagueUpdates.map((update) => (
+                <BeerLeagueCard key={update.id} update={update} />
+              ))}
+            </div>
+          ) : (
+            <div className="text-center py-12">
+              <p className="text-secondary">No beer cooler articles found. Check back soon!</p>
+            </div>
+          )}
         </div>
       </section>
 
