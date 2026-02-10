@@ -2,11 +2,17 @@
 
 import Link from "next/link";
 import { useState, useEffect } from "react";
-import { Menu, X } from "lucide-react";
+import { Menu, X, ChevronDown } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { MoonIcon } from "./moon-icon";
 import { usePathname } from "next/navigation";
 import { Logo } from "./logo";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 
 export function Navigation() {
   const [menuOpen, setMenuOpen] = useState(false);
@@ -46,20 +52,38 @@ export function Navigation() {
     }
   };
 
-  const mainLinks = [
+  // Sport links (always visible on desktop)
+  const sportLinks = [
     { href: "/basketball", label: "Basketball", color: "basketball" },
     { href: "/football", label: "Football", color: "football" },
     { href: "/lacrosse", label: "Lacrosse", color: "lacrosse" },
-    { href: "/video", label: "Video", color: "primary" },
-    { href: "/rankings", label: "Rankings", color: "primary" },
-    { href: "/recruiting", label: "Recruiting", color: "primary" },
   ];
 
-  const utilityLinks = [
+  // Content dropdown links
+  const contentLinks = [
+    { href: "/video", label: "Video" },
+    { href: "/rankings", label: "Rankings" },
+    { href: "/recruiting", label: "Recruiting" },
+    { href: "/college", label: "College Corner" },
+    { href: "/beer-cooler", label: "Beer Cooler" },
+  ];
+
+  // About dropdown links
+  const aboutLinks = [
     { href: "/staff", label: "Staff" },
     { href: "/faq", label: "FAQ" },
     { href: "/scoresnap", label: "ScoreSnap" },
     { href: "/pressbox", label: "Press Box AI" },
+  ];
+
+  // For mobile menu - combine all links with grouping
+  const mobileMainLinks = [
+    ...sportLinks,
+    { href: "/video", label: "Video", color: "primary" },
+    { href: "/rankings", label: "Rankings", color: "primary" },
+    { href: "/recruiting", label: "Recruiting", color: "primary" },
+    { href: "/college", label: "College Corner", color: "primary" },
+    { href: "/beer-cooler", label: "Beer Cooler", color: "primary" },
   ];
 
   const isActive = (href: string) => {
@@ -101,12 +125,14 @@ export function Navigation() {
                 width={160}
                 height={40}
                 className="h-8 md:h-10 w-auto"
+                href=""
               />
             </Link>
 
             {/* Desktop Navigation - Hidden on Mobile */}
             <nav className="hidden lg:flex items-center gap-1">
-              {mainLinks.map((link) => {
+              {/* Sport Links - Always Visible */}
+              {sportLinks.map((link) => {
                 const active = isActive(link.href);
                 return (
                   <Link
@@ -137,6 +163,60 @@ export function Navigation() {
                   </Link>
                 );
               })}
+
+              {/* Content Dropdown */}
+              <DropdownMenu>
+                <DropdownMenuTrigger className="flex items-center gap-1 px-4 py-2 text-sm font-medium text-secondary hover:text-foreground transition-colors duration-150 outline-none">
+                  Content
+                  <ChevronDown className="w-4 h-4" />
+                </DropdownMenuTrigger>
+                <DropdownMenuContent
+                  align="start"
+                  className="w-48 bg-card border-border"
+                >
+                  {contentLinks.map((link) => (
+                    <DropdownMenuItem key={link.href} asChild>
+                      <Link
+                        href={link.href}
+                        className={`w-full cursor-pointer ${
+                          isActive(link.href)
+                            ? "text-primary font-semibold"
+                            : "text-foreground"
+                        }`}
+                      >
+                        {link.label}
+                      </Link>
+                    </DropdownMenuItem>
+                  ))}
+                </DropdownMenuContent>
+              </DropdownMenu>
+
+              {/* About Dropdown */}
+              <DropdownMenu>
+                <DropdownMenuTrigger className="flex items-center gap-1 px-4 py-2 text-sm font-medium text-secondary hover:text-foreground transition-colors duration-150 outline-none">
+                  More
+                  <ChevronDown className="w-4 h-4" />
+                </DropdownMenuTrigger>
+                <DropdownMenuContent
+                  align="start"
+                  className="w-48 bg-card border-border"
+                >
+                  {aboutLinks.map((link) => (
+                    <DropdownMenuItem key={link.href} asChild>
+                      <Link
+                        href={link.href}
+                        className={`w-full cursor-pointer ${
+                          isActive(link.href)
+                            ? "text-primary font-semibold"
+                            : "text-foreground"
+                        }`}
+                      >
+                        {link.label}
+                      </Link>
+                    </DropdownMenuItem>
+                  ))}
+                </DropdownMenuContent>
+              </DropdownMenu>
             </nav>
 
             {/* Right Side Actions */}
@@ -209,7 +289,7 @@ export function Navigation() {
                   <div className="text-xs font-semibold text-muted uppercase tracking-wider mb-3">
                     Coverage
                   </div>
-                  {mainLinks.map((link) => {
+                  {mobileMainLinks.map((link) => {
                     const active = isActive(link.href);
                     return (
                       <Link
@@ -248,7 +328,7 @@ export function Navigation() {
                   <div className="text-xs font-semibold text-muted uppercase tracking-wider mb-3">
                     More
                   </div>
-                  {utilityLinks.map((link) => {
+                  {aboutLinks.map((link) => {
                     const active = isActive(link.href);
                     return (
                       <Link

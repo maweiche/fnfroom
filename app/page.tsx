@@ -1,5 +1,3 @@
-import { CTAMarquee } from "@/components/cta-marquee";
-import { Navigation } from "@/components/navigation";
 import { HeroGrid } from "@/components/hero-grid";
 import { UpcomingGames } from "@/components/upcoming-games";
 import { ArticlesGrid } from "@/components/articles-grid";
@@ -51,10 +49,7 @@ export default async function HomePage() {
     }));
 
   return (
-    <div className="min-h-screen">
-      {/* CTA Marquee Banner - Above Everything */}
-      
-
+    <div className="min-h-screen pt-4">
       {/* Hero Section - Title + Cards Fill Viewport */}
       <div className="flex flex-col" style={{ minHeight: 'calc(100vh - 48px)' }}>
         {/* Hero Grid (1-2 Layout) - Featured Articles, Video, Games of Week */}

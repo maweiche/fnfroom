@@ -48,6 +48,7 @@ export default defineType({
           { title: "Recruiting", value: "recruiting" },
           { title: "News", value: "news" },
           { title: "Opinion", value: "opinion" },
+          { title: "Beer Cooler (Adult League)", value: "beer-cooler" },
         ],
       },
     }),

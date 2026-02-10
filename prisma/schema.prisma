@@ -12,28 +12,133 @@ datasource db {
 }
 
 // ========================================
-// EXISTING SUPABASE MODELS (Reference Only)
+// SUPABASE MODELS (Complete Schema Integration)
 // ========================================
-// Uncomment when you need to work with schools directly
 
-// model School {
-//   id              String    @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
-//   key             String    @unique
-//   name            String
-//   city            String?
-//   classification  String?
-//   conference      String?
-//   createdAt       DateTime  @default(now()) @map("created_at")
-//   updatedAt       DateTime  @updatedAt @map("updated_at")
-//
-//   homeGames       Game[]    @relation("HomeTeam")
-//   awayGames       Game[]    @relation("AwayTeam")
-//
-//   @@map("schools")
-//   @@index([key])
-//   @@index([classification])
-//   @@index([conference])
-// }
+model School {
+  id              String    @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  key             String    @unique
+  name            String
+  city            String?
+  classification  String?
+  conference      String?
+  createdAt       DateTime  @default(now()) @map("created_at")
+  updatedAt       DateTime  @updatedAt @map("updated_at")
+
+  homeGames       Game[]    @relation("HomeTeam")
+  awayGames       Game[]    @relation("AwayTeam")
+  aliases         SchoolAlias[]
+  players         Player[]
+  rankings        TeamRanking[]
+
+  @@map("schools")
+  @@index([key])
+  @@index([classification])
+  @@index([conference])
+}
+
+model SchoolAlias {
+  id              String    @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  schoolId        String    @map("school_id") @db.Uuid
+  school          School    @relation(fields: [schoolId], references: [id], onDelete: Cascade)
+  alias           String
+  createdAt       DateTime  @default(now()) @map("created_at")
+
+  @@unique([schoolId, alias])
+  @@map("school_aliases")
+  @@index([schoolId])
+}
+
+model Player {
+  id                    String    @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  firstName             String    @map("first_name")
+  lastName              String    @map("last_name")
+  schoolId              String?   @map("school_id") @db.Uuid
+  school                School?   @relation(fields: [schoolId], references: [id], onDelete: SetNull)
+  maxprepsProfileUrl    String?   @unique @map("maxpreps_profile_url")
+  maxprepsSchoolName    String?   @map("maxpreps_school_name")
+  city                  String?
+  state                 String?
+  position              String?
+
+  // College tracking fields
+  collegeName           String?   @map("college_name")
+  collegeDivision       String?   @map("college_division")
+  collegeClassYear      String?   @map("college_class_year")
+
+  createdAt             DateTime  @default(now()) @map("created_at")
+  updatedAt             DateTime  @updatedAt @map("updated_at")
+
+  stats                 PlayerStats[]
+
+  @@map("players")
+  @@index([schoolId])
+  @@index([state])
+  @@index([lastName])
+  @@index([collegeName])
+}
+
+model PlayerStats {
+  id                    String    @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  playerId              String    @map("player_id") @db.Uuid
+  player                Player    @relation(fields: [playerId], references: [id], onDelete: Cascade)
+  sport                 String
+  season                String
+  statType              String    @map("stat_type")
+  value                 Float
+  perGameValue          Float?    @map("per_game_value")
+  gamesPlayed           Int?      @map("games_played")
+  nationalRank          Int?      @map("national_rank")
+  stateRank             Int?      @map("state_rank")
+
+  // Basketball-specific fields
+  fieldGoalsMade        Int?      @map("field_goals_made")
+  fieldGoalAttempts     Int?      @map("field_goal_attempts")
+  fieldGoalPercentage   Float?    @map("field_goal_percentage")
+  threePointMade        Int?      @map("three_point_made")
+  threePointPercentage  Float?    @map("three_point_percentage")
+  freeThrowsMade        Int?      @map("free_throws_made")
+  freeThrowPercentage   Float?    @map("free_throw_percentage")
+
+  source                String    @default("maxpreps")
+  createdAt             DateTime  @default(now()) @map("created_at")
+  updatedAt             DateTime  @updatedAt @map("updated_at")
+
+  @@unique([playerId, sport, season, statType, source])
+  @@map("player_stats")
+  @@index([playerId])
+  @@index([sport, season])
+  @@index([statType])
+  @@index([nationalRank])
+}
+
+model TeamRanking {
+  id                    String    @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  schoolId              String?   @map("school_id") @db.Uuid
+  school                School?   @relation(fields: [schoolId], references: [id], onDelete: SetNull)
+  maxprepsSchoolId      String?   @map("maxpreps_school_id")
+  maxprepsSchoolName    String    @map("maxpreps_school_name")
+  sport                 String
+  season                String
+  rank                  Int
+  rating                Float?
+  strength              Float?
+  wins                  Int?
+  losses                Int?
+  ties                  Int       @default(0)
+  movement              String?
+  state                 String    @default("NC")
+  lastUpdated           DateTime? @map("last_updated")
+  source                String    @default("maxpreps")
+  createdAt             DateTime  @default(now()) @map("created_at")
+  updatedAt             DateTime  @updatedAt @map("updated_at")
+
+  @@unique([maxprepsSchoolId, sport, season, source])
+  @@map("team_rankings")
+  @@index([schoolId])
+  @@index([sport, season])
+  @@index([rank])
+}
 
 // ========================================
 // MODEL 1: User (Authentication)
@@ -111,7 +216,9 @@ model Game {
   date            DateTime  @db.Date
   sport           String
   homeTeamId      String?   @map("home_team_id") @db.Uuid
+  homeTeam        School?   @relation("HomeTeam", fields: [homeTeamId], references: [id], onDelete: SetNull)
   awayTeamId      String?   @map("away_team_id") @db.Uuid
+  awayTeam        School?   @relation("AwayTeam", fields: [awayTeamId], references: [id], onDelete: SetNull)
   homeScore       Int?      @map("home_score")
   awayScore       Int?      @map("away_score")
   status          String?

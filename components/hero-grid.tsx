@@ -75,7 +75,7 @@ export async function HeroGrid({ featuredArticles = [], featuredVideoPlaybackId 
                 <p className="text-white/60 text-sm">No featured video</p>
               </div>
             )} */}
-            <video src="/motion_logo.mp4" className="w-full h-full" autoPlay muted loop />
+            <video src="/motion_logo.mp4" className="w-full h-full" autoPlay muted loop playsInline  />
           </div>
 
           {/* Games of the Week Card - Bottom Right (takes remaining space) */}

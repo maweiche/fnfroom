@@ -5,6 +5,7 @@ import { Footer } from "@/components/footer";
 import { AuthProvider } from "@/lib/auth-context";
 import { Navigation } from "@/components/navigation";
 import { CTAMarquee } from "@/components/cta-marquee";
+import { ScoreStreamWidget } from "@/components/widgets/scorestream-widget";
 const inter = Inter({
   subsets: ["latin"],
   variable: "--font-inter",
@@ -151,8 +152,9 @@ export default function RootLayout({
       </head>
       <body className="font-sans antialiased bg-background">
         <AuthProvider>
-        <CTAMarquee />  
         <Navigation />
+        {/* ScoreStream Widget - Live High School Scores */}
+        <ScoreStreamWidget /> 
           <main className="min-h-screen">{children}</main>
           <Footer />
         </AuthProvider>

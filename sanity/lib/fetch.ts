@@ -7,6 +7,7 @@ import {
   featuredArticleBySportQuery,
   articleBySlugQuery,
   articlesBySportQuery,
+  articlesByCategoryQuery,
   relatedArticlesQuery,
   staffMembersQuery,
   staffMemberBySlugQuery,
@@ -81,6 +82,19 @@ export async function getArticlesBySport(
   return client.fetch(
     articlesBySportQuery,
     { sport },
+    { next: { revalidate: 60 } }
+  );
+}
+
+/**
+ * Fetch articles by category
+ */
+export async function getArticlesByCategory(
+  category: string
+): Promise<Article[]> {
+  return client.fetch(
+    articlesByCategoryQuery,
+    { category },
     { next: { revalidate: 60 } }
   );
 }

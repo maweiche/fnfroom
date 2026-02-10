@@ -124,13 +124,25 @@ Friday Night Film Room is a regional sports news outlet covering North Carolina 
 2. **ScoreSnap**: AI-powered score upload system where coaches submit game photos that are extracted via Claude Vision API
 3. **Press Box AI**: Voice-to-article platform where coaches speak game recaps that are transformed into articles via Claude
 
+### Data Architecture
+The site uses a **multi-source data strategy**:
+- **Supabase/PostgreSQL (via Prisma)**: High school games, schools, players, stats, rankings (MaxPreps API data)
+- **Sanity CMS**: Editorial content, articles, videos, featured player profiles, editorial rankings
+- **Static Files**: Beer Cooler standings only (`data/triad-lacrosse-standings.ts`)
+
+**Important**:
+- Use database for high school operational/statistical data
+- Use Sanity for editorial content
+- Beer Cooler page: Articles from Sanity (category: "beer-cooler"), standings from static file
+- **Beer Cooler articles must be tagged with category "beer-cooler" in Sanity to appear on page**
+
 ### Tech Stack
 - **Framework**: Next.js 16 (App Router with Turbopack)
 - **Database**: PostgreSQL (Supabase) with Prisma ORM
 - **CMS**: Sanity for articles, videos, rankings
 - **Styling**: Tailwind CSS with custom design system
 - **Auth**: JWT with bcrypt (see `lib/auth.ts`)
-- **AI**: Anthropic Claude SDK for vision extraction and article generation
+- **AI**: Multi-provider support (Google Gemini [default] or Anthropic Claude) for vision extraction and article generation
 - **Video**: Mux for video hosting
 
 ### Development Commands
@@ -179,11 +191,18 @@ bunx prisma generate  # Regenerate client
 ### Architecture Patterns
 
 #### Database Layer (Prisma + PostgreSQL)
-- **7 Models**: User, Submission, Game, ValidationError, EditHistory, Conversation, Article
-- Game data maps to existing Supabase `schools` and `games` tables
+- **13 Models**: User, Submission, Game, ValidationError, EditHistory, Conversation, Article, School, SchoolAlias, Player, PlayerStats, TeamRanking
+- **4 Views**: games_with_schools, school_stats, players_with_stats, rankings_with_schools
 - JWT authentication with role-based access (ADMIN, COACH, WRITER)
 - All models use UUID primary keys with `@db.Uuid` type
 - Timestamps use `@map("snake_case")` for database column names
+
+**Key Tables:**
+- `schools` - NC high school directory
+- `games` - Game results and schedules (all sports)
+- `players` - Individual athletes from MaxPreps (includes college tracking: college_name, college_division, college_class_year)
+- `player_stats` - Statistics by sport/season
+- `team_rankings` - MaxPreps team rankings
 
 #### Authentication Flow
 1. Login via `/api/auth/login` returns JWT token
@@ -256,12 +275,32 @@ if (!user) {
 }
 ```
 
+### Data API Routes
+
+**Games:**
+- `GET /api/games/weekly` - Scheduled games for current week
+- `GET /api/games/top-matchups?limit=N` - Top ranked matchups
+
+**Players:**
+- `GET /api/players` - Editorial players from Sanity + DB count
+- `GET /api/players/stats?sport=X&season=X&statType=X&state=NC&limit=20` - Player statistics leaderboards
+
+**Rankings:**
+- `GET /api/rankings/maxpreps?sport=X&season=X&state=NC&limit=25` - MaxPreps power rankings
+
+**College:**
+- `GET /api/college/updates?sport=X&limit=10` - NC high school athletes playing at college level
+
+**Note:** Beer Cooler (adult lacrosse league) uses static data files in `data/triad-lacrosse-standings.ts`, not API routes.
+
 ### Environment Variables
 
-Required in `.env`:
+Required in `.env.local`:
 - `DATABASE_URL` - PostgreSQL connection string
 - `JWT_SECRET` - Secret for JWT signing
-- `ANTHROPIC_API_KEY` - Claude API key
+- `AI_PROVIDER` - AI provider selection: "gemini" (default) or "anthropic"
+- `GEMINI_API_KEY` - Google Gemini API key (required if using Gemini)
+- `ANTHROPIC_API_KEY` - Claude API key (required if using Anthropic)
 - `NEXT_PUBLIC_SANITY_PROJECT_ID` - Sanity project ID
 - `NEXT_PUBLIC_SANITY_DATASET` - Sanity dataset (usually "production")
 - `SANITY_API_TOKEN` - Sanity write token for uploads

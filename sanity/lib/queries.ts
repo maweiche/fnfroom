@@ -127,6 +127,23 @@ export const articlesBySportQuery = groq`
 `;
 
 /**
+ * Get articles by category
+ */
+export const articlesByCategoryQuery = groq`
+  *[_type == "article" && category == $category] | order(publishDate desc) {
+    _id,
+    title,
+    slug,
+    sport,
+    category,
+    publishDate,
+    ${authorFragment},
+    ${imageFragment},
+    excerpt
+  }
+`;
+
+/**
  * Get related articles (same sport, excluding current article)
  */
 export const relatedArticlesQuery = groq`

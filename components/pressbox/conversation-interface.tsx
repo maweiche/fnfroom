@@ -32,6 +32,8 @@ export function ConversationInterface({
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState('');
   const [isGenerating, setIsGenerating] = useState(false);
+  const [textInput, setTextInput] = useState('');
+  const [inputMode, setInputMode] = useState<'voice' | 'text'>('voice');
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const router = useRouter();
 
@@ -41,6 +43,7 @@ export function ConversationInterface({
 
   const handleTranscript = async (text: string) => {
     setError('');
+    setTextInput(''); // Clear text input after sending
 
     // Add user message optimistically
     const userMessage: Message = {
@@ -84,6 +87,13 @@ export function ConversationInterface({
       console.error(err);
     } finally {
       setIsLoading(false);
+    }
+  };
+
+  const handleTextSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (textInput.trim() && !isLoading && !isGenerating) {
+      handleTranscript(textInput.trim());
     }
   };
 
@@ -137,7 +147,7 @@ export function ConversationInterface({
         {messages.length === 0 && (
           <div className="text-center text-muted-foreground py-12">
             <p className="text-lg mb-2">Ready to start your interview</p>
-            <p className="text-sm">Click the microphone and tell me about the game</p>
+            <p className="text-sm">Use voice or text to tell me about the game</p>
           </div>
         )}
 
@@ -176,11 +186,70 @@ export function ConversationInterface({
 
       {/* Controls */}
       <div className="border-t pt-4 space-y-4">
-        <VoiceRecorder
-          onTranscript={handleTranscript}
-          onError={setError}
-          disabled={isLoading || isGenerating}
-        />
+        {/* Input Mode Toggle */}
+        <div className="flex gap-2 justify-center">
+          <button
+            onClick={() => setInputMode('voice')}
+            className={cn(
+              "px-4 py-2 rounded-lg text-sm font-medium transition-colors",
+              inputMode === 'voice'
+                ? "bg-primary text-primary-foreground"
+                : "bg-muted text-muted-foreground hover:bg-muted/80"
+            )}
+          >
+            Voice
+          </button>
+          <button
+            onClick={() => setInputMode('text')}
+            className={cn(
+              "px-4 py-2 rounded-lg text-sm font-medium transition-colors",
+              inputMode === 'text'
+                ? "bg-primary text-primary-foreground"
+                : "bg-muted text-muted-foreground hover:bg-muted/80"
+            )}
+          >
+            Text
+          </button>
+        </div>
+
+        {/* Voice Input */}
+        {inputMode === 'voice' && (
+          <VoiceRecorder
+            onTranscript={handleTranscript}
+            onError={setError}
+            disabled={isLoading || isGenerating}
+          />
+        )}
+
+        {/* Text Input */}
+        {inputMode === 'text' && (
+          <form onSubmit={handleTextSubmit} className="space-y-2">
+            <textarea
+              value={textInput}
+              onChange={(e) => setTextInput(e.target.value)}
+              placeholder="Type or paste your response here..."
+              disabled={isLoading || isGenerating}
+              className="w-full min-h-[100px] p-3 rounded-lg border bg-background resize-y disabled:opacity-50"
+              onKeyDown={(e) => {
+                if (e.key === 'Enter' && e.metaKey) {
+                  handleTextSubmit(e);
+                }
+              }}
+            />
+            <div className="flex justify-between items-center">
+              <p className="text-xs text-muted-foreground">
+                Press ⌘+Enter to send
+              </p>
+              <button
+                type="submit"
+                disabled={!textInput.trim() || isLoading || isGenerating}
+                className="px-4 py-2 bg-primary text-primary-foreground rounded-lg text-sm font-medium hover:bg-primary/90 disabled:opacity-50 transition-colors"
+              >
+                {isLoading ? 'Sending...' : 'Send'}
+              </button>
+            </div>
+          </form>
+        )}
 
         {canGenerate && (
           <button

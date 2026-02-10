@@ -242,6 +242,33 @@ import { Logo } from '@/components/logo';
   <div className="container mx-auto px-4">
     <div className="flex items-center justify-between h-20 md:h-24">
       <Logo variant="header" width={200} height={50} />
+      <div className="flex items-center gap-1">
+        {/* Desktop: Sport links always visible */}
+        <Link href="/basketball">Basketball</Link>
+        <Link href="/football">Football</Link>
+        <Link href="/lacrosse">Lacrosse</Link>
+
+        {/* Desktop: Dropdown menus for grouped content */}
+        <DropdownMenu>
+          <DropdownMenuTrigger>Content</DropdownMenuTrigger>
+          <DropdownMenuContent>
+            <DropdownMenuItem>Video</DropdownMenuItem>
+            <DropdownMenuItem>Rankings</DropdownMenuItem>
+            <DropdownMenuItem>Recruiting</DropdownMenuItem>
+            <DropdownMenuItem>College Corner</DropdownMenuItem>
+          </DropdownMenuContent>
+        </DropdownMenu>
+
+        <DropdownMenu>
+          <DropdownMenuTrigger>More</DropdownMenuTrigger>
+          <DropdownMenuContent>
+            <DropdownMenuItem>Staff</DropdownMenuItem>
+            <DropdownMenuItem>FAQ</DropdownMenuItem>
+            <DropdownMenuItem>ScoreSnap</DropdownMenuItem>
+            <DropdownMenuItem>Press Box AI</DropdownMenuItem>
+          </DropdownMenuContent>
+        </DropdownMenu>
+      </div>
       <div className="flex items-center gap-3">
         <ThemeToggle />
         <MenuButton />
@@ -255,6 +282,8 @@ import { Logo } from '@/components/logo';
 - Sticky positioning for persistent header
 - Logo: Header variant, responsive sizing
 - Border bottom: Subtle separator
+- **Desktop**: Sport links always visible, grouped content in dropdowns
+- **Mobile**: Fullscreen menu with sectioned groups (Coverage, More)
 
 ### Rankings Table
 ```tsx
@@ -386,6 +415,8 @@ Enabled: true
 - [ ] Rankings pages
 - [ ] Recruiting board
 - [ ] Staff pages
+- [x] College Corner page
+- [x] Beer Cooler page (Adult League coverage)
 
 ## Notes
 

@@ -1,14 +1,23 @@
 /**
- * Press Box AI - Claude API Integration
- * Handles conversation and article generation
+ * Press Box AI - Multi-Provider AI Integration
+ * Supports Anthropic Claude and Google Gemini
  */
 
 import Anthropic from '@anthropic-ai/sdk';
+import { GoogleGenerativeAI } from '@google/generative-ai';
 import { PROMPTS } from './pressbox-prompts';
 
-let claudeInstance: Anthropic | null = null;
+type AIProvider = 'anthropic' | 'gemini';
 
-export function getClaude(): Anthropic {
+let claudeInstance: Anthropic | null = null;
+let geminiInstance: GoogleGenerativeAI | null = null;
+
+export function getProvider(): AIProvider {
+  const provider = process.env.AI_PROVIDER?.toLowerCase() || 'gemini';
+  return provider === 'anthropic' ? 'anthropic' : 'gemini';
+}
+
+function getClaude(): Anthropic {
   if (!claudeInstance) {
     if (!process.env.ANTHROPIC_API_KEY) {
       throw new Error('ANTHROPIC_API_KEY not set in environment variables');
@@ -18,6 +27,16 @@ export function getClaude(): Anthropic {
     });
   }
   return claudeInstance;
+}
+
+function getGemini(): GoogleGenerativeAI {
+  if (!geminiInstance) {
+    if (!process.env.GEMINI_API_KEY) {
+      throw new Error('GEMINI_API_KEY not set in environment variables');
+    }
+    geminiInstance = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
+  }
+  return geminiInstance;
 }
 
 export function buildInterviewPrompt(
@@ -73,17 +92,37 @@ export async function getConversationResponse(
   messages: Array<{ role: 'user' | 'assistant'; content: string }>,
   systemPrompt: string
 ): Promise<string> {
-  const claude = getClaude();
+  const provider = getProvider();
 
-  const response = await claude.messages.create({
-    model: 'claude-sonnet-4-5-20250929',
-    max_tokens: 1024,
-    system: systemPrompt,
-    messages,
-  });
+  if (provider === 'gemini') {
+    const genAI = getGemini();
+    const model = genAI.getGenerativeModel({
+      model: 'gemini-1.5-pro',
+      systemInstruction: systemPrompt
+    });
 
-  const content = response.content[0];
-  return content.type === 'text' ? content.text : '';
+    // Convert messages to Gemini format
+    const history = messages.slice(0, -1).map(msg => ({
+      role: msg.role === 'assistant' ? 'model' : 'user',
+      parts: [{ text: msg.content }],
+    }));
+
+    const chat = model.startChat({ history });
+    const lastMessage = messages[messages.length - 1];
+    const result = await chat.sendMessage(lastMessage.content);
+    return result.response.text();
+  } else {
+    const claude = getClaude();
+    const response = await claude.messages.create({
+      model: 'claude-sonnet-4-5-20250929',
+      max_tokens: 1024,
+      system: systemPrompt,
+      messages,
+    });
+
+    const content = response.content[0];
+    return content.type === 'text' ? content.text : '';
+  }
 }
 
 export async function generateArticle(
@@ -93,18 +132,28 @@ export async function generateArticle(
   awayTeam: string,
   writerStyle: string | null
 ): Promise<{ headline: string; body: string }> {
-  const claude = getClaude();
+  const provider = getProvider();
   const prompt = buildArticlePrompt(transcript, sport, homeTeam, awayTeam, writerStyle);
 
-  const response = await claude.messages.create({
-    model: 'claude-opus-4-6',
-    max_tokens: 2048,
-    messages: [{ role: 'user', content: prompt }],
-  });
+  let articleText: string;
 
-  const articleText = response.content[0].type === 'text'
-    ? response.content[0].text
-    : '';
+  if (provider === 'gemini') {
+    const genAI = getGemini();
+    const model = genAI.getGenerativeModel({ model: 'gemini-1.5-pro' });
+    const result = await model.generateContent(prompt);
+    articleText = result.response.text();
+  } else {
+    const claude = getClaude();
+    const response = await claude.messages.create({
+      model: 'claude-opus-4-6',
+      max_tokens: 2048,
+      messages: [{ role: 'user', content: prompt }],
+    });
+
+    articleText = response.content[0].type === 'text'
+      ? response.content[0].text
+      : '';
+  }
 
   // Extract headline and body
   const lines = articleText.split('\n');
