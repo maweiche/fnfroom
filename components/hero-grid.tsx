@@ -12,8 +12,8 @@ interface HeroGridProps {
 }
 
 export async function HeroGrid({ featuredArticles = [], featuredVideoPlaybackId }: HeroGridProps) {
-  // Fetch top matchups for Games of the Week
-  let topGames: Array<{
+  // Fetch upcoming games for the week
+  let weeklyGames: Array<{
     id: string;
     date: string;
     sport: string;
@@ -22,29 +22,32 @@ export async function HeroGrid({ featuredArticles = [], featuredVideoPlaybackId 
       name: string;
       city: string;
       classification: string;
-      record: string;
     };
     awayTeam: {
       name: string;
       city: string;
       classification: string;
-      record: string;
     };
     status: string;
   }> = [];
 
   try {
     const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || "http://localhost:3000";
-    const response = await fetch(`${baseUrl}/api/games/top-matchups?limit=5`, {
+    const response = await fetch(`${baseUrl}/api/games/weekly`, {
       cache: "no-store",
     });
     if (response.ok) {
       const data = await response.json();
-      topGames = data.games || [];
+      weeklyGames = data.games || [];
     }
   } catch (error) {
-    console.error("Failed to fetch top matchups:", error);
+    console.error("Failed to fetch weekly games:", error);
   }
+
+  // Filter for Boys (Men's) games only
+  const mensGames = weeklyGames.filter(game =>
+    !game.gender || game.gender.toLowerCase() === "boys"
+  );
 
   return (
     <section className="container mx-auto px-4 pt-0 pb-8 md:pb-12 flex-1 flex items-stretch">
@@ -78,9 +81,9 @@ export async function HeroGrid({ featuredArticles = [], featuredVideoPlaybackId 
             <video src="/motion_logo.mp4" className="w-full h-full" autoPlay muted loop playsInline  />
           </div>
 
-          {/* Games of the Week Card - Bottom Right (takes remaining space) */}
+          {/* Upcoming Men's Games Table - Bottom Right (takes remaining space) */}
           <div className="flex-1 min-h-0">
-            <GamesOfWeekCard games={topGames} />
+            <UpcomingMensGamesTable games={mensGames} />
           </div>
         </div>
       </div>
@@ -132,8 +135,8 @@ function FeaturedArticleCard({ article, priority = false }: FeaturedArticleCardP
   );
 }
 
-// Games of the Week Card Component
-interface GamesOfWeekCardProps {
+// Upcoming Men's Games Table Component
+interface UpcomingMensGamesTableProps {
   games: Array<{
     id: string;
     date: string;
@@ -143,85 +146,98 @@ interface GamesOfWeekCardProps {
       name: string;
       city: string;
       classification: string;
-      record: string;
     };
     awayTeam: {
       name: string;
       city: string;
       classification: string;
-      record: string;
     };
     status: string;
   }>;
 }
 
-function GamesOfWeekCard({ games }: GamesOfWeekCardProps) {
+function UpcomingMensGamesTable({ games }: UpcomingMensGamesTableProps) {
   return (
-    <div className="rounded-lg bg-card-mint border-l-4 border-l-primary p-6 shadow-card h-full flex flex-col">
-      <div className="flex items-center justify-between mb-4">
-        <h3 className="font-display font-bold text-xl text-foreground dark:text-white">Games of the Week</h3>
+    <div className="rounded-lg bg-card border border-border shadow-card h-full flex flex-col overflow-hidden">
+      {/* Header */}
+      <div className="flex items-center justify-between px-4 py-3 border-b border-border bg-muted/20">
+        <h3 className="font-display font-bold text-base text-foreground">Upcoming Games</h3>
         <Link
           href="/schedule"
-          className="text-sm font-medium text-primary hover:text-primary/90 transition-colors"
+          className="text-xs font-medium text-primary hover:text-primary/90 transition-colors"
         >
           View All
         </Link>
       </div>
 
-      <div className="space-y-4 flex-1 overflow-y-auto">
+      {/* Table Container with Scroll */}
+      <div className="flex-1 overflow-y-auto">
         {games.length > 0 ? (
-          games.map((game) => {
-            const gameDate = new Date(game.date);
-            const formattedDate = gameDate.toLocaleDateString("en-US", {
-              month: "short",
-              day: "numeric",
-            });
+          <table className="w-full text-xs">
+            <thead className="sticky top-0 bg-muted/50 border-b border-border">
+              <tr className="text-secondary uppercase tracking-wide">
+                <th className="text-left px-4 py-2 font-medium">Date</th>
+                <th className="text-left px-4 py-2 font-medium">Matchup</th>
+                <th className="text-center px-4 py-2 font-medium">Sport</th>
+                <th className="text-center px-4 py-2 font-medium">Class</th>
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-border/30">
+              {games.slice(0, 10).map((game) => {
+                const gameDate = new Date(game.date);
+                const formattedDate = gameDate.toLocaleDateString("en-US", {
+                  month: "short",
+                  day: "numeric",
+                });
 
-            return (
-              <div
-                key={game.id}
-                className="pb-4 border-b border-border/30 last:border-0 last:pb-0"
-              >
-                <div className="flex items-start justify-between mb-2 gap-2">
-                  <div className="flex-1">
-                    <div className="font-semibold text-sm leading-tight text-foreground dark:text-white">
-                      {game.homeTeam.name}
-                      <span className="text-[10px] text-muted dark:text-white/70 font-normal ml-1">
-                        ({game.homeTeam.record})
+                return (
+                  <tr
+                    key={game.id}
+                    className="hover:bg-muted/30 transition-colors duration-150"
+                  >
+                    {/* Date */}
+                    <td className="px-4 py-3 text-secondary whitespace-nowrap">
+                      <div className="flex items-center gap-1">
+                        <Calendar className="w-3 h-3" />
+                        <span>{formattedDate}</span>
+                      </div>
+                    </td>
+
+                    {/* Matchup */}
+                    <td className="px-4 py-3">
+                      <div className="flex flex-col gap-0.5">
+                        <div className="font-medium text-foreground text-xs leading-tight">
+                          {game.homeTeam.name}
+                        </div>
+                        <div className="text-[10px] text-muted">vs</div>
+                        <div className="font-medium text-foreground text-xs leading-tight">
+                          {game.awayTeam.name}
+                        </div>
+                      </div>
+                    </td>
+
+                    {/* Sport */}
+                    <td className="px-4 py-3 text-center">
+                      <span className="inline-flex items-center px-2 py-0.5 rounded text-[10px] font-semibold bg-primary/10 text-primary">
+                        {game.sport}
                       </span>
-                    </div>
-                    <div className="text-muted dark:text-white/60 font-normal text-xs my-1">vs</div>
-                    <div className="font-semibold text-sm leading-tight text-foreground dark:text-white">
-                      {game.awayTeam.name}
-                      <span className="text-[10px] text-muted dark:text-white/70 font-normal ml-1">
-                        ({game.awayTeam.record})
+                    </td>
+
+                    {/* Classification */}
+                    <td className="px-4 py-3 text-center">
+                      <span className="font-mono text-[10px] text-muted">
+                        {game.homeTeam.classification} v {game.awayTeam.classification}
                       </span>
-                    </div>
-                  </div>
-                  <span className="inline-flex items-center px-2 py-1 rounded text-[10px] font-medium bg-primary/20 text-primary shrink-0">
-                    {game.sport}
-                  </span>
-                </div>
-                <div className="flex items-center gap-3 text-xs text-secondary dark:text-white/70 mt-2">
-                  <div className="flex items-center gap-1">
-                    <Calendar className="w-3 h-3" />
-                    <span>{formattedDate}</span>
-                  </div>
-                  {game.gender && (
-                    <div className="flex items-center gap-1">
-                      <span className="capitalize">{game.gender}</span>
-                    </div>
-                  )}
-                </div>
-                <div className="flex items-center gap-1 mt-2 text-xs text-secondary dark:text-white/70">
-                  <MapPin className="w-3 h-3" />
-                  <span>{game.homeTeam.city}</span>
-                </div>
-              </div>
-            );
-          })
+                    </td>
+                  </tr>
+                );
+              })}
+            </tbody>
+          </table>
         ) : (
-          <p className="text-muted dark:text-white/70 text-sm">No games scheduled this week</p>
+          <div className="flex items-center justify-center h-full px-4 py-8">
+            <p className="text-muted text-xs">No upcoming games scheduled</p>
+          </div>
         )}
       </div>
     </div>

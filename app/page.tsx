@@ -1,5 +1,4 @@
 import { HeroGrid } from "@/components/hero-grid";
-import { UpcomingGames } from "@/components/upcoming-games";
 import { ArticlesGrid } from "@/components/articles-grid";
 import { VideoSpotlight } from "@/components/video-spotlight";
 import { RankingsSnapshot } from "@/components/rankings-snapshot";
@@ -58,9 +57,6 @@ export default async function HomePage() {
           featuredVideoPlaybackId={heroVideoPlaybackId}
         />
       </div>
-
-      {/* Upcoming Games Section */}
-      <UpcomingGames />
 
       {/* Latest Articles Grid with Filters */}
       <ArticlesGrid
