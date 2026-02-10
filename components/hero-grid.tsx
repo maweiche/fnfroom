@@ -4,6 +4,7 @@ import MuxPlayer from "@mux/mux-player-react";
 import { Calendar, MapPin, Clock } from "lucide-react";
 import { SportTag } from "./sport-tag";
 import { urlFor } from "@/sanity/lib/image";
+import { prisma } from "@/lib/prisma";
 import type { Article } from "@/lib/sanity.types";
 
 interface HeroGridProps {
@@ -12,7 +13,7 @@ interface HeroGridProps {
 }
 
 export async function HeroGrid({ featuredArticles = [], featuredVideoPlaybackId }: HeroGridProps) {
-  // Fetch upcoming games for the week
+  // Fetch upcoming games for the week directly from database
   let weeklyGames: Array<{
     id: string;
     date: string;
@@ -32,14 +33,62 @@ export async function HeroGrid({ featuredArticles = [], featuredVideoPlaybackId 
   }> = [];
 
   try {
-    const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || "http://localhost:3000";
-    const response = await fetch(`${baseUrl}/api/games/weekly`, {
-      cache: "no-store",
-    });
-    if (response.ok) {
-      const data = await response.json();
-      weeklyGames = data.games || [];
-    }
+    // Get the current week's date range (Sunday to Saturday)
+    const targetDate = new Date();
+    const dayOfWeek = targetDate.getDay();
+
+    // Calculate start of week (Sunday)
+    const startOfWeek = new Date(targetDate);
+    startOfWeek.setDate(targetDate.getDate() - dayOfWeek);
+    startOfWeek.setHours(0, 0, 0, 0);
+
+    // Calculate end of week (Saturday)
+    const endOfWeek = new Date(startOfWeek);
+    endOfWeek.setDate(startOfWeek.getDate() + 6);
+    endOfWeek.setHours(23, 59, 59, 999);
+
+    const startDate = startOfWeek.toISOString().split('T')[0];
+    const endDateStr = endOfWeek.toISOString().split('T')[0];
+
+    // Fetch scheduled games for the week from database
+    const games = await prisma.$queryRaw<Array<{
+      id: string;
+      date: string;
+      sport: string;
+      gender: string | null;
+      home_team: string;
+      home_city: string;
+      home_classification: string;
+      away_team: string;
+      away_city: string;
+      away_classification: string;
+      status: string;
+    }>>`
+      SELECT * FROM games_with_schools
+      WHERE status = 'Scheduled'
+      AND date >= ${startDate}::date
+      AND date <= ${endDateStr}::date
+      ORDER BY date ASC, sport, gender
+    `;
+
+    // Transform to match expected format
+    weeklyGames = games.map(game => ({
+      id: game.id,
+      date: game.date,
+      sport: game.sport,
+      gender: game.gender,
+      homeTeam: {
+        name: game.home_team,
+        city: game.home_city,
+        classification: game.home_classification,
+      },
+      awayTeam: {
+        name: game.away_team,
+        city: game.away_city,
+        classification: game.away_classification,
+      },
+      status: game.status,
+    }));
   } catch (error) {
     console.error("Failed to fetch weekly games:", error);
   }
