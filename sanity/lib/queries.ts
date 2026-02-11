@@ -446,3 +446,29 @@ export const articlesByPlayerQuery = groq`
     ${imageFragment}
   }
 `;
+
+/**
+ * Get videos featuring a specific player
+ */
+export const videosByPlayerQuery = groq`
+  *[_type == "video" && $playerName in playerTags]
+  | order(publishDate desc) [0...3] {
+    _id, title, slug, video, sport, publishDate,
+    contributor->{ _id, name, slug }
+  }
+`;
+
+/**
+ * Get similar players (same sport, similar grad year)
+ */
+export const similarPlayersQuery = groq`
+  *[_type == "player"
+    && sport == $sport
+    && gradYear >= $minGradYear
+    && gradYear <= $maxGradYear
+    && _id != $currentId
+  ] | order(gradYear desc, featured desc) [0...4] {
+    _id, name, slug, photo, sport, gradYear,
+    position, school, height, featured
+  }
+`;

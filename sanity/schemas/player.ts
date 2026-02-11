@@ -183,6 +183,23 @@ export default defineType({
       ],
     }),
     defineField({
+      name: "dbPlayerId",
+      title: "Database Player ID",
+      type: "string",
+      description: "UUID linking to Player table in PostgreSQL database",
+      validation: (Rule) =>
+        Rule.custom((value) => {
+          if (!value) return true;
+          const uuidRegex =
+            /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+          return (
+            uuidRegex.test(value) ||
+            "Must be a valid UUID (e.g., from PostgreSQL database)"
+          );
+        }),
+      hidden: ({ document }) => !document?.dbPlayerId, // Only show if value exists
+    }),
+    defineField({
       name: "featured",
       title: "Featured Player",
       type: "boolean",

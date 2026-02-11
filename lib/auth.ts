@@ -6,7 +6,7 @@ const JWT_SECRET = new TextEncoder().encode(
   process.env.JWT_SECRET || 'change-me-to-a-secure-random-string-in-production'
 );
 
-export type Role = 'ADMIN' | 'COACH';
+export type Role = 'ADMIN' | 'COACH' | 'WRITER' | 'PLAYER' | 'FAN';
 
 export interface JWTPayload {
   userId: string;
@@ -187,4 +187,25 @@ export function isAdmin(user: { role: string }): boolean {
  */
 export function isVerifiedCoach(user: { role: string; verifiedAt: Date | null }): boolean {
   return user.role === 'COACH' && user.verifiedAt !== null;
+}
+
+/**
+ * Verify user is a player with linked account
+ */
+export function isPlayer(user: { role: string; playerId: string | null }): boolean {
+  return user.role === 'PLAYER' && user.playerId !== null;
+}
+
+/**
+ * Check if user has one of the allowed roles
+ */
+export function requireRole(user: any, allowedRoles: Role[]): boolean {
+  return allowedRoles.includes(user.role as Role);
+}
+
+/**
+ * Verify user is a writer
+ */
+export function isWriter(user: { role: string }): boolean {
+  return user.role === 'WRITER';
 }

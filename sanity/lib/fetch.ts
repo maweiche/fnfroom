@@ -24,6 +24,8 @@ import {
   featuredPlayersQuery,
   playerBySlugQuery,
   articlesByPlayerQuery,
+  videosByPlayerQuery,
+  similarPlayersQuery,
 } from "./queries";
 
 /**
@@ -263,6 +265,37 @@ export async function getArticlesByPlayer(
   return client.fetch(
     articlesByPlayerQuery,
     { playerName },
+    { next: { revalidate: 300 } }
+  );
+}
+
+/**
+ * Fetch videos featuring a specific player
+ */
+export async function getVideosByPlayer(playerName: string): Promise<Video[]> {
+  return client.fetch(
+    videosByPlayerQuery,
+    { playerName },
+    { next: { revalidate: 300 } }
+  );
+}
+
+/**
+ * Fetch similar players (same sport, similar grad year)
+ */
+export async function getSimilarPlayers(
+  sport: "basketball" | "football" | "lacrosse",
+  gradYear: number,
+  currentId: string
+): Promise<Player[]> {
+  return client.fetch(
+    similarPlayersQuery,
+    {
+      sport,
+      minGradYear: gradYear - 1,
+      maxGradYear: gradYear + 1,
+      currentId,
+    },
     { next: { revalidate: 300 } }
   );
 }

@@ -15,7 +15,7 @@ export function PlayerCard({ player }: PlayerCardProps) {
 
   return (
     <Link
-      href={`/recruiting/${player.slug.current}`}
+      href={`/player/${player.slug.current}`}
       className="group block"
     >
       <article className="overflow-hidden rounded-lg bg-card shadow-card hover:shadow-card-hover transition-shadow duration-200 h-full">

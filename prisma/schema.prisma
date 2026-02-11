@@ -16,233 +16,256 @@ datasource db {
 // ========================================
 
 model School {
-  id              String    @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
-  key             String    @unique
-  name            String
-  city            String?
-  classification  String?
-  conference      String?
-  createdAt       DateTime  @default(now()) @map("created_at")
-  updatedAt       DateTime  @updatedAt @map("updated_at")
+  id             String   @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  key            String   @unique
+  name           String
+  city           String?
+  classification String?
+  conference     String?
+  createdAt      DateTime @default(now()) @map("created_at")
+  updatedAt      DateTime @updatedAt @map("updated_at")
 
-  homeGames       Game[]    @relation("HomeTeam")
-  awayGames       Game[]    @relation("AwayTeam")
-  aliases         SchoolAlias[]
-  players         Player[]
-  rankings        TeamRanking[]
+  homeGames Game[]        @relation("HomeTeam")
+  awayGames Game[]        @relation("AwayTeam")
+  aliases   SchoolAlias[]
+  players   Player[]
+  rankings  TeamRanking[]
+  rosters   Roster[]
 
-  @@map("schools")
   @@index([key])
   @@index([classification])
   @@index([conference])
+  @@map("schools")
 }
 
 model SchoolAlias {
-  id              String    @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
-  schoolId        String    @map("school_id") @db.Uuid
-  school          School    @relation(fields: [schoolId], references: [id], onDelete: Cascade)
-  alias           String
-  createdAt       DateTime  @default(now()) @map("created_at")
+  id        String   @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  schoolId  String   @map("school_id") @db.Uuid
+  school    School   @relation(fields: [schoolId], references: [id], onDelete: Cascade)
+  alias     String
+  createdAt DateTime @default(now()) @map("created_at")
 
   @@unique([schoolId, alias])
-  @@map("school_aliases")
   @@index([schoolId])
+  @@map("school_aliases")
 }
 
 model Player {
-  id                    String    @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
-  firstName             String    @map("first_name")
-  lastName              String    @map("last_name")
-  schoolId              String?   @map("school_id") @db.Uuid
-  school                School?   @relation(fields: [schoolId], references: [id], onDelete: SetNull)
-  maxprepsProfileUrl    String?   @unique @map("maxpreps_profile_url")
-  maxprepsSchoolName    String?   @map("maxpreps_school_name")
-  city                  String?
-  state                 String?
-  position              String?
+  id                 String  @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  firstName          String  @map("first_name")
+  lastName           String  @map("last_name")
+  schoolId           String? @map("school_id") @db.Uuid
+  school             School? @relation(fields: [schoolId], references: [id], onDelete: SetNull)
+  maxprepsProfileUrl String? @unique @map("maxpreps_profile_url")
+  maxprepsSchoolName String? @map("maxpreps_school_name")
+  city               String?
+  state              String?
+  position           String?
 
   // College tracking fields
-  collegeName           String?   @map("college_name")
-  collegeDivision       String?   @map("college_division")
-  collegeClassYear      String?   @map("college_class_year")
+  collegeName      String? @map("college_name")
+  collegeDivision  String? @map("college_division")
+  collegeClassYear String? @map("college_class_year")
 
-  createdAt             DateTime  @default(now()) @map("created_at")
-  updatedAt             DateTime  @updatedAt @map("updated_at")
+  // Account and profile linking
+  sanityProfileId String? @unique @map("sanity_profile_id")
+  accountUser     User?   @relation("PlayerAccount")
 
-  stats                 PlayerStats[]
+  // Player-editable fields (separate from MaxPreps data)
+  bio             String? @db.Text
+  heightFeet      Int?    @map("height_feet")
+  heightInches    Int?    @map("height_inches")
+  weight          Int?
+  jerseyNumber    String? @map("jersey_number")
+  socialTwitter   String? @map("social_twitter")
+  socialInstagram String? @map("social_instagram")
+  socialHudl      String? @map("social_hudl")
 
-  @@map("players")
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  stats        PlayerStats[]
+  offers       CollegeOffer[]
+  rosters      Roster[]            @relation("RosterPlayers")
+  claimRequest PlayerClaimRequest?
+
   @@index([schoolId])
   @@index([state])
   @@index([lastName])
   @@index([collegeName])
+  @@index([sanityProfileId])
+  @@map("players")
 }
 
 model PlayerStats {
-  id                    String    @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
-  playerId              String    @map("player_id") @db.Uuid
-  player                Player    @relation(fields: [playerId], references: [id], onDelete: Cascade)
-  sport                 String
-  season                String
-  statType              String    @map("stat_type")
-  value                 Float
-  perGameValue          Float?    @map("per_game_value")
-  gamesPlayed           Int?      @map("games_played")
-  nationalRank          Int?      @map("national_rank")
-  stateRank             Int?      @map("state_rank")
+  id           String @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  playerId     String @map("player_id") @db.Uuid
+  player       Player @relation(fields: [playerId], references: [id], onDelete: Cascade)
+  sport        String
+  season       String
+  statType     String @map("stat_type")
+  value        Float
+  perGameValue Float? @map("per_game_value")
+  gamesPlayed  Int?   @map("games_played")
+  nationalRank Int?   @map("national_rank")
+  stateRank    Int?   @map("state_rank")
 
   // Basketball-specific fields
-  fieldGoalsMade        Int?      @map("field_goals_made")
-  fieldGoalAttempts     Int?      @map("field_goal_attempts")
-  fieldGoalPercentage   Float?    @map("field_goal_percentage")
-  threePointMade        Int?      @map("three_point_made")
-  threePointPercentage  Float?    @map("three_point_percentage")
-  freeThrowsMade        Int?      @map("free_throws_made")
-  freeThrowPercentage   Float?    @map("free_throw_percentage")
+  fieldGoalsMade       Int?   @map("field_goals_made")
+  fieldGoalAttempts    Int?   @map("field_goal_attempts")
+  fieldGoalPercentage  Float? @map("field_goal_percentage")
+  threePointMade       Int?   @map("three_point_made")
+  threePointPercentage Float? @map("three_point_percentage")
+  freeThrowsMade       Int?   @map("free_throws_made")
+  freeThrowPercentage  Float? @map("free_throw_percentage")
 
-  source                String    @default("maxpreps")
-  createdAt             DateTime  @default(now()) @map("created_at")
-  updatedAt             DateTime  @updatedAt @map("updated_at")
+  source    String   @default("maxpreps")
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
 
   @@unique([playerId, sport, season, statType, source])
-  @@map("player_stats")
   @@index([playerId])
   @@index([sport, season])
   @@index([statType])
   @@index([nationalRank])
+  @@map("player_stats")
 }
 
 model TeamRanking {
-  id                    String    @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
-  schoolId              String?   @map("school_id") @db.Uuid
-  school                School?   @relation(fields: [schoolId], references: [id], onDelete: SetNull)
-  maxprepsSchoolId      String?   @map("maxpreps_school_id")
-  maxprepsSchoolName    String    @map("maxpreps_school_name")
-  sport                 String
-  season                String
-  rank                  Int
-  rating                Float?
-  strength              Float?
-  wins                  Int?
-  losses                Int?
-  ties                  Int       @default(0)
-  movement              String?
-  state                 String    @default("NC")
-  lastUpdated           DateTime? @map("last_updated")
-  source                String    @default("maxpreps")
-  createdAt             DateTime  @default(now()) @map("created_at")
-  updatedAt             DateTime  @updatedAt @map("updated_at")
+  id                 String    @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  schoolId           String?   @map("school_id") @db.Uuid
+  school             School?   @relation(fields: [schoolId], references: [id], onDelete: SetNull)
+  maxprepsSchoolId   String?   @map("maxpreps_school_id")
+  maxprepsSchoolName String    @map("maxpreps_school_name")
+  sport              String
+  season             String
+  rank               Int
+  rating             Float?
+  strength           Float?
+  wins               Int?
+  losses             Int?
+  ties               Int       @default(0)
+  movement           String?
+  state              String    @default("NC")
+  lastUpdated        DateTime? @map("last_updated")
+  source             String    @default("maxpreps")
+  createdAt          DateTime  @default(now()) @map("created_at")
+  updatedAt          DateTime  @updatedAt @map("updated_at")
 
   @@unique([maxprepsSchoolId, sport, season, source])
-  @@map("team_rankings")
   @@index([schoolId])
   @@index([sport, season])
   @@index([rank])
+  @@map("team_rankings")
 }
 
 // ========================================
 // MODEL 1: User (Authentication)
 // ========================================
 model User {
-  id            String   @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
-  email         String   @unique
-  passwordHash  String   @map("password_hash")
-  name          String
-  role          String   @default("COACH") // 'ADMIN', 'COACH', or 'WRITER'
+  id           String @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  email        String @unique
+  passwordHash String @map("password_hash")
+  name         String
+  role         String @default("FAN") // 'ADMIN', 'COACH', 'WRITER', 'PLAYER', 'FAN'
 
   // Coach-specific fields
-  schoolName    String?  @map("school_name")
-  primarySport  String?  @map("primary_sport")
-  verifiedAt    DateTime? @map("verified_at")
+  schoolName   String?   @map("school_name")
+  primarySport String?   @map("primary_sport")
+  verifiedAt   DateTime? @map("verified_at")
 
   // Press Box AI fields (for writers)
   writerStyleNotes String? @map("writer_style_notes") @db.Text
 
+  // Player account linking
+  playerId String? @unique @map("player_id") @db.Uuid
+  player   Player? @relation("PlayerAccount", fields: [playerId], references: [id], onDelete: SetNull)
+
   // Relations
   submissions   Submission[]
   conversations Conversation[] // Press Box AI
-  articles      Article[]      // Press Box AI
+  articles      Article[] // Press Box AI
 
-  createdAt     DateTime  @default(now()) @map("created_at")
-  updatedAt     DateTime  @updatedAt @map("updated_at")
-  deletedAt     DateTime? @map("deleted_at")
+  createdAt DateTime  @default(now()) @map("created_at")
+  updatedAt DateTime  @updatedAt @map("updated_at")
+  deletedAt DateTime? @map("deleted_at")
 
-  @@map("users")
   @@index([email])
   @@index([role])
   @@index([schoolName])
   @@index([verifiedAt])
+  @@index([playerId])
+  @@map("users")
 }
 
 // ========================================
 // MODEL 2: Submission (Upload Session)
 // ========================================
 model Submission {
-  id               String    @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
-  userId           String    @map("user_id") @db.Uuid
-  user             User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  id     String @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  userId String @map("user_id") @db.Uuid
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
 
-  sport            String    // "BASKETBALL", "FOOTBALL", etc.
-  status           String    @default("DRAFT") // 'DRAFT', 'PROCESSING', 'COMPLETED', 'FAILED'
+  sport  String // "BASKETBALL", "FOOTBALL", etc.
+  status String @default("DRAFT") // 'DRAFT', 'PROCESSING', 'COMPLETED', 'FAILED'
 
   // Image storage (Sanity CDN URLs)
-  imageUrl         String    @map("image_url")
-  imageAssetId     String?   @map("image_asset_id")
+  imageUrl     String  @map("image_url")
+  imageAssetId String? @map("image_asset_id")
 
   // AI extraction (full JSON response from Claude)
-  rawAiResponse    Json?     @map("raw_ai_response")
-  processingTimeMs Int?      @map("processing_time_ms")
+  rawAiResponse    Json? @map("raw_ai_response")
+  processingTimeMs Int?  @map("processing_time_ms")
 
   // Relations
-  game             Game?
+  game Game?
 
-  createdAt        DateTime  @default(now()) @map("created_at")
-  updatedAt        DateTime  @updatedAt @map("updated_at")
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
 
-  @@map("submissions")
   @@index([userId])
   @@index([status])
   @@index([sport])
   @@index([createdAt])
+  @@map("submissions")
 }
 
 // ========================================
 // MODEL 3: Game (Approved Game Data - Maps to existing Supabase games table)
 // ========================================
 model Game {
-  id              String    @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  id String @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
 
   // Existing Supabase fields
-  date            DateTime  @db.Date
-  sport           String
-  homeTeamId      String?   @map("home_team_id") @db.Uuid
-  homeTeam        School?   @relation("HomeTeam", fields: [homeTeamId], references: [id], onDelete: SetNull)
-  awayTeamId      String?   @map("away_team_id") @db.Uuid
-  awayTeam        School?   @relation("AwayTeam", fields: [awayTeamId], references: [id], onDelete: SetNull)
-  homeScore       Int?      @map("home_score")
-  awayScore       Int?      @map("away_score")
-  status          String?
-  source          String?
-  gender          String?
+  date       DateTime @db.Date
+  sport      String
+  homeTeamId String?  @map("home_team_id") @db.Uuid
+  homeTeam   School?  @relation("HomeTeam", fields: [homeTeamId], references: [id], onDelete: SetNull)
+  awayTeamId String?  @map("away_team_id") @db.Uuid
+  awayTeam   School?  @relation("AwayTeam", fields: [awayTeamId], references: [id], onDelete: SetNull)
+  homeScore  Int?     @map("home_score")
+  awayScore  Int?     @map("away_score")
+  status     String?
+  source     String?
+  gender     String?
 
   // ScoreSnap enhancement fields
-  submissionId    String?   @unique @map("submission_id") @db.Uuid
-  submission      Submission? @relation(fields: [submissionId], references: [id], onDelete: Restrict)
+  submissionId String?     @unique @map("submission_id") @db.Uuid
+  submission   Submission? @relation(fields: [submissionId], references: [id], onDelete: Restrict)
 
-  quarterScores   Json?     @map("quarter_scores") // [[Q1_home, Q1_away], ...]
-  overtime        Boolean   @default(false)
-  gameData        Json?     @map("game_data") // Complete player stats from AI
-  editableUntil   DateTime? @map("editable_until")
-  approvedBy      String?   @map("approved_by") @db.Uuid
+  quarterScores Json?     @map("quarter_scores") // [[Q1_home, Q1_away], ...]
+  overtime      Boolean   @default(false)
+  gameData      Json?     @map("game_data") // Complete player stats from AI
+  editableUntil DateTime? @map("editable_until")
+  approvedBy    String?   @map("approved_by") @db.Uuid
 
   // Relations
-  editHistory     EditHistory[]
+  editHistory EditHistory[]
 
-  createdAt       DateTime  @default(now()) @map("created_at")
-  updatedAt       DateTime  @updatedAt @map("updated_at")
-  deletedAt       DateTime? @map("deleted_at")
+  createdAt DateTime  @default(now()) @map("created_at")
+  updatedAt DateTime  @updatedAt @map("updated_at")
+  deletedAt DateTime? @map("deleted_at")
 
-  @@map("games")
   @@index([sport])
   @@index([date])
   @@index([sport, date])
@@ -251,50 +274,51 @@ model Game {
   @@index([submissionId])
   @@index([editableUntil])
   @@index([deletedAt])
+  @@map("games")
 }
 
 // ========================================
 // MODEL 4: ValidationError (AI Quality Tracking)
 // ========================================
 model ValidationError {
-  id              String    @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
-  submissionId    String    @map("submission_id") @db.Uuid
+  id           String @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  submissionId String @map("submission_id") @db.Uuid
 
-  errorCode       String    @map("error_code")
-  errorMessage    String    @map("error_message")
-  fieldPath       String?   @map("field_path")
+  errorCode    String  @map("error_code")
+  errorMessage String  @map("error_message")
+  fieldPath    String? @map("field_path")
 
   // Coach override
-  overridden      Boolean   @default(false)
-  overrideReason  String?   @map("override_reason")
+  overridden     Boolean @default(false)
+  overrideReason String? @map("override_reason")
 
-  createdAt       DateTime  @default(now()) @map("created_at")
+  createdAt DateTime @default(now()) @map("created_at")
 
-  @@map("validation_errors")
   @@index([submissionId])
   @@index([errorCode])
   @@index([createdAt])
+  @@map("validation_errors")
 }
 
 // ========================================
 // MODEL 5: EditHistory (Field-Level Changes)
 // ========================================
 model EditHistory {
-  id              String    @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
-  gameId          String    @map("game_id") @db.Uuid
-  game            Game      @relation(fields: [gameId], references: [id], onDelete: Cascade)
+  id     String @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  gameId String @map("game_id") @db.Uuid
+  game   Game   @relation(fields: [gameId], references: [id], onDelete: Cascade)
 
-  editedBy        String    @map("edited_by") @db.Uuid
-  editedAt        DateTime  @default(now()) @map("edited_at")
+  editedBy String   @map("edited_by") @db.Uuid
+  editedAt DateTime @default(now()) @map("edited_at")
 
-  fieldPath       String    @map("field_path")
-  oldValue        String?   @map("old_value")
-  newValue        String?   @map("new_value")
+  fieldPath String  @map("field_path")
+  oldValue  String? @map("old_value")
+  newValue  String? @map("new_value")
 
-  @@map("edit_history")
   @@index([gameId])
   @@index([editedAt])
   @@index([fieldPath])
+  @@map("edit_history")
 }
 
 // ========================================
@@ -305,59 +329,162 @@ model EditHistory {
 // MODEL 6: Conversation (Voice Interview Session)
 // ========================================
 model Conversation {
-  id           String   @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
-  userId       String   @map("user_id") @db.Uuid
-  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  id     String @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  userId String @map("user_id") @db.Uuid
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
 
-  sport        String   @default("football") // football, basketball, soccer, etc.
+  sport String @default("football") // football, basketball, soccer, etc.
 
   // Game info (proper columns for queryability)
-  homeTeam     String   @map("home_team")
-  awayTeam     String   @map("away_team")
-  homeScore    Int?     @map("home_score")
-  awayScore    Int?     @map("away_score")
-  gameDate     DateTime @map("game_date")
-  location     String?
+  homeTeam  String   @map("home_team")
+  awayTeam  String   @map("away_team")
+  homeScore Int?     @map("home_score")
+  awayScore Int?     @map("away_score")
+  gameDate  DateTime @map("game_date")
+  location  String?
 
   // Transcript (JSON only because it's truly variable-length array)
   // Format: [{role: "user"|"assistant", content: string, timestamp: string}]
-  transcript   Json
+  transcript Json
 
-  completed    Boolean  @default(false)
+  completed Boolean @default(false)
 
-  createdAt    DateTime @default(now()) @map("created_at")
+  createdAt DateTime @default(now()) @map("created_at")
 
   // Relations
-  articles     Article[]
+  articles Article[]
 
-  @@map("conversations")
   @@index([userId, createdAt])
   @@index([completed])
   @@index([sport, gameDate])
+  @@map("conversations")
 }
 
 // ========================================
 // MODEL 7: Article (Generated Article Draft)
 // ========================================
 model Article {
-  id             String    @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
-  conversationId String    @map("conversation_id") @db.Uuid
+  id             String       @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  conversationId String       @map("conversation_id") @db.Uuid
   conversation   Conversation @relation(fields: [conversationId], references: [id], onDelete: Cascade)
 
-  userId         String    @map("user_id") @db.Uuid
-  user           User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId String @map("user_id") @db.Uuid
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
 
-  headline       String
-  bodyMarkdown   String    @map("body_markdown") @db.Text
+  headline     String
+  bodyMarkdown String @map("body_markdown") @db.Text
 
-  published      Boolean   @default(false)
-  editCount      Int       @default(0) @map("edit_count")
+  published Boolean @default(false)
+  editCount Int     @default(0) @map("edit_count")
 
-  createdAt      DateTime  @default(now()) @map("created_at")
-  publishedAt    DateTime? @map("published_at")
+  createdAt   DateTime  @default(now()) @map("created_at")
+  publishedAt DateTime? @map("published_at")
 
-  @@map("articles")
   @@index([userId, createdAt])
   @@index([conversationId])
   @@index([published])
+  @@map("articles")
+}
+
+// ========================================
+// ADMIN PANEL MODELS
+// ========================================
+
+// ========================================
+// MODEL 8: PlayerClaimRequest (Player Profile Claiming)
+// ========================================
+model PlayerClaimRequest {
+  id       String @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  playerId String @unique @map("player_id") @db.Uuid
+  player   Player @relation(fields: [playerId], references: [id], onDelete: Cascade)
+
+  requestedEmail   String @map("requested_email")
+  requestedBy      String @map("requested_by")
+  verificationInfo Json   @map("verification_info")
+
+  status          String    @default("PENDING") // 'PENDING', 'APPROVED', 'REJECTED'
+  reviewedBy      String?   @map("reviewed_by") @db.Uuid
+  reviewedAt      DateTime? @map("reviewed_at")
+  rejectionReason String?   @map("rejection_reason")
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  @@index([status])
+  @@map("player_claim_requests")
+}
+
+// ========================================
+// MODEL 9: CollegeOffer (Player College Offers)
+// ========================================
+model CollegeOffer {
+  id       String @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  playerId String @map("player_id") @db.Uuid
+  player   Player @relation(fields: [playerId], references: [id], onDelete: Cascade)
+
+  collegeName     String    @map("college_name")
+  collegeDivision String    @map("college_division") // D1, D2, D3, NAIA, JUCO
+  offerType       String    @map("offer_type") // 'OFFER', 'INTEREST', 'VERBAL_COMMIT', 'SIGNED'
+  offerDate       DateTime? @map("offer_date")
+  sport           String
+
+  verified   Boolean   @default(false)
+  verifiedBy String?   @map("verified_by") @db.Uuid
+  verifiedAt DateTime? @map("verified_at")
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  @@index([playerId])
+  @@index([verified])
+  @@map("college_offers")
+}
+
+// ========================================
+// MODEL 10: Roster (Team Rosters by School/Sport/Season)
+// ========================================
+model Roster {
+  id       String @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  schoolId String @map("school_id") @db.Uuid
+  school   School @relation(fields: [schoolId], references: [id], onDelete: Cascade)
+
+  playerId String @map("player_id") @db.Uuid
+  player   Player @relation("RosterPlayers", fields: [playerId], references: [id], onDelete: Cascade)
+
+  sport        String
+  season       String
+  jerseyNumber String? @map("jersey_number")
+  position     String?
+  grade        String? // 'FR', 'SO', 'JR', 'SR'
+  status       String  @default("ACTIVE") // 'ACTIVE', 'INJURED', 'INACTIVE'
+
+  managedBy String? @map("managed_by") @db.Uuid
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  @@unique([schoolId, playerId, sport, season])
+  @@index([schoolId, sport, season])
+  @@map("rosters")
+}
+
+// ========================================
+// MODEL 11: AdminAuditLog (Admin Action Tracking)
+// ========================================
+model AdminAuditLog {
+  id          String @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  adminUserId String @map("admin_user_id") @db.Uuid
+
+  action     String // 'USER_CREATED', 'PLAYER_CLAIMED_APPROVED', 'OFFER_VERIFIED', etc.
+  targetType String @map("target_type") // 'USER', 'PLAYER', 'GAME', 'ROSTER'
+  targetId   String @map("target_id")
+
+  changes Json?
+  notes   String? @db.Text
+
+  createdAt DateTime @default(now()) @map("created_at")
+
+  @@index([adminUserId])
+  @@index([targetType, targetId])
+  @@map("admin_audit_logs")
 }
