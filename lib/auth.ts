@@ -159,6 +159,7 @@ export async function getUserFromToken(token: string) {
       primarySport: true,
       verifiedAt: true,
       writerStyleNotes: true, // For Press Box AI
+      playerId: true, // For player account linking
     },
   });
 
