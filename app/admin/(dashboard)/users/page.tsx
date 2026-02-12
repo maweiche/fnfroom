@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect, useCallback } from "react";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { DataTable, type Column } from "@/components/admin/shared/data-table";
@@ -17,28 +17,63 @@ interface User {
   createdAt: string;
 }
 
-// Placeholder data - will be replaced with actual API calls
-const mockUsers: User[] = [];
+function getAuthToken() {
+  const match = document.cookie.match(/(?:^|; )auth_token=([^;]*)/);
+  return match ? match[1] : null;
+}
 
 export default function UsersPage() {
+  const [users, setUsers] = useState<User[]>([]);
+  const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState("");
   const [roleFilter, setRoleFilter] = useState("all");
   const [verifiedFilter, setVerifiedFilter] = useState("all");
 
-  const filteredUsers = mockUsers.filter((user) => {
-    const matchesSearch =
-      user.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      user.email.toLowerCase().includes(searchQuery.toLowerCase());
+  const fetchUsers = useCallback(async () => {
+    setLoading(true);
+    const token = getAuthToken();
+    const params = new URLSearchParams();
+    if (roleFilter !== "all") params.set("role", roleFilter);
+    if (verifiedFilter !== "all") params.set("verified", verifiedFilter === "verified" ? "true" : "false");
+    if (searchQuery) params.set("search", searchQuery);
 
-    const matchesRole = roleFilter === "all" || user.role === roleFilter;
+    try {
+      const res = await fetch(`/api/admin/users?${params}`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      if (res.ok) {
+        const json = await res.json();
+        setUsers(json.data);
+      }
+    } catch (err) {
+      console.error("Failed to fetch users:", err);
+    } finally {
+      setLoading(false);
+    }
+  }, [roleFilter, verifiedFilter, searchQuery]);
 
-    const matchesVerified =
-      verifiedFilter === "all" ||
-      (verifiedFilter === "verified" && user.verifiedAt !== null) ||
-      (verifiedFilter === "unverified" && user.verifiedAt === null);
+  useEffect(() => {
+    const timer = setTimeout(fetchUsers, searchQuery ? 300 : 0);
+    return () => clearTimeout(timer);
+  }, [fetchUsers, searchQuery]);
 
-    return matchesSearch && matchesRole && matchesVerified;
-  });
+  const handleDelete = async (userId: string) => {
+    if (!confirm("Are you sure you want to delete this user?")) return;
+    const token = getAuthToken();
+    try {
+      const res = await fetch(`/api/admin/users/${userId}`, {
+        method: "DELETE",
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      if (res.ok) {
+        fetchUsers();
+      }
+    } catch (err) {
+      console.error("Failed to delete user:", err);
+    }
+  };
+
+  const filteredUsers = users;
 
   const columns: Column<User>[] = [
     {
@@ -110,7 +145,7 @@ export default function UsersPage() {
             title="Delete user"
             onClick={(e) => {
               e.stopPropagation();
-              // TODO: Delete user
+              handleDelete(value);
             }}
           >
             <Trash2 className="w-4 h-4 text-destructive" />
@@ -173,7 +208,11 @@ export default function UsersPage() {
       />
 
       {/* Users table */}
-      <DataTable data={filteredUsers} columns={columns} />
+      {loading ? (
+        <div className="text-center py-12 text-muted">Loading users...</div>
+      ) : (
+        <DataTable data={filteredUsers} columns={columns} />
+      )}
     </div>
   );
 }

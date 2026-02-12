@@ -13,6 +13,7 @@ import {
   School,
   GraduationCap,
   FileText,
+  Upload,
 } from "lucide-react";
 
 interface NavItem {
@@ -52,6 +53,11 @@ const navItems: NavItem[] = [
     name: "Games",
     href: "/admin/games",
     icon: Calendar,
+  },
+  {
+    name: "Schedule Upload",
+    href: "/admin/schedules",
+    icon: Upload,
   },
   {
     name: "Stats",

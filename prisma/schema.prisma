@@ -248,6 +248,8 @@ model Game {
   status     String?
   source     String?
   gender     String?
+  gameTime      String?  @map("game_time")       // "7:15 PM"
+  isConference  Boolean  @default(false) @map("is_conference")
 
   // ScoreSnap enhancement fields
   submissionId String?     @unique @map("submission_id") @db.Uuid

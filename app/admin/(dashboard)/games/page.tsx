@@ -1,10 +1,10 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { DataTable, type Column } from "@/components/admin/shared/data-table";
 import { FilterBar } from "@/components/admin/shared/filter-bar";
-import { Plus, Edit, Trash2 } from "lucide-react";
+import { Plus, Edit, Trash2, Loader2 } from "lucide-react";
 
 interface Game {
   id: string;
@@ -16,23 +16,53 @@ interface Game {
   awayScore?: number;
   status: string;
   source?: string;
+  gameTime?: string;
+  isConference?: boolean;
 }
 
-// Placeholder data
-const mockGames: Game[] = [];
+function getAuthToken() {
+  const match = document.cookie.match(/(?:^|; )auth_token=([^;]*)/);
+  return match ? match[1] : null;
+}
 
 export default function GamesPage() {
+  const [games, setGames] = useState<Game[]>([]);
+  const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState("");
   const [sportFilter, setSportFilter] = useState("all");
   const [statusFilter, setStatusFilter] = useState("all");
 
-  const filteredGames = mockGames.filter((game) => {
+  useEffect(() => {
+    async function fetchGames() {
+      try {
+        const token = getAuthToken();
+        const res = await fetch("/api/admin/games", {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+        if (res.ok) {
+          const json = await res.json();
+          setGames(json.data || []);
+        }
+      } catch (err) {
+        console.error("Failed to fetch games:", err);
+      } finally {
+        setLoading(false);
+      }
+    }
+    fetchGames();
+  }, []);
+
+  const filteredGames = games.filter((game) => {
     const matchesSearch =
       game.homeTeam.toLowerCase().includes(searchQuery.toLowerCase()) ||
       game.awayTeam.toLowerCase().includes(searchQuery.toLowerCase());
 
-    const matchesSport = sportFilter === "all" || game.sport === sportFilter;
-    const matchesStatus = statusFilter === "all" || game.status === statusFilter;
+    const matchesSport =
+      sportFilter === "all" ||
+      game.sport.toLowerCase() === sportFilter.toLowerCase();
+    const matchesStatus =
+      statusFilter === "all" ||
+      game.status?.toLowerCase() === statusFilter.toLowerCase();
 
     return matchesSearch && matchesSport && matchesStatus;
   });
@@ -83,14 +113,14 @@ export default function GamesPage() {
       render: (value) => (
         <span
           className={`inline-flex items-center px-2 py-1 rounded text-xs font-medium ${
-            value === "FINAL"
+            value === "Final"
               ? "bg-success/20 text-success"
-              : value === "LIVE"
+              : value === "Live"
               ? "bg-warning/20 text-warning"
               : "bg-muted/20 text-muted"
           }`}
         >
-          {value}
+          {value || "—"}
         </span>
       ),
     },
@@ -104,7 +134,6 @@ export default function GamesPage() {
             title="Edit game"
             onClick={(e) => {
               e.stopPropagation();
-              // TODO: Edit game
             }}
           >
             <Edit className="w-4 h-4 text-foreground" />
@@ -114,7 +143,6 @@ export default function GamesPage() {
             title="Delete game"
             onClick={(e) => {
               e.stopPropagation();
-              // TODO: Delete game
             }}
           >
             <Trash2 className="w-4 h-4 text-destructive" />
@@ -165,16 +193,22 @@ export default function GamesPage() {
             onChange: setStatusFilter,
             options: [
               { value: "all", label: "All Status" },
-              { value: "SCHEDULED", label: "Scheduled" },
-              { value: "LIVE", label: "Live" },
-              { value: "FINAL", label: "Final" },
+              { value: "scheduled", label: "Scheduled" },
+              { value: "live", label: "Live" },
+              { value: "final", label: "Final" },
             ],
           },
         ]}
       />
 
       {/* Games table */}
-      <DataTable data={filteredGames} columns={columns} />
+      {loading ? (
+        <div className="flex items-center justify-center py-12">
+          <Loader2 className="w-6 h-6 text-muted animate-spin" />
+        </div>
+      ) : (
+        <DataTable data={filteredGames} columns={columns} />
+      )}
     </div>
   );
 }

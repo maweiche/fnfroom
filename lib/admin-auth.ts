@@ -40,7 +40,7 @@ export async function requireAdmin(request: Request) {
 export async function createAuditLog(params: {
   adminUserId: string;
   action: string;
-  targetType: 'USER' | 'PLAYER' | 'GAME' | 'ROSTER' | 'SCHOOL' | 'OFFER' | 'CLAIM';
+  targetType: 'USER' | 'PLAYER' | 'GAME' | 'ROSTER' | 'SCHOOL' | 'OFFER' | 'CLAIM' | 'SCHEDULE';
   targetId: string;
   changes?: any;
   notes?: string;

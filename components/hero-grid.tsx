@@ -33,24 +33,9 @@ export async function HeroGrid({ featuredArticles = [], featuredVideoPlaybackId 
   }> = [];
 
   try {
-    // Get the current week's date range (Sunday to Saturday)
-    const targetDate = new Date();
-    const dayOfWeek = targetDate.getDay();
+    const today = new Date().toISOString().split('T')[0];
 
-    // Calculate start of week (Sunday)
-    const startOfWeek = new Date(targetDate);
-    startOfWeek.setDate(targetDate.getDate() - dayOfWeek);
-    startOfWeek.setHours(0, 0, 0, 0);
-
-    // Calculate end of week (Saturday)
-    const endOfWeek = new Date(startOfWeek);
-    endOfWeek.setDate(startOfWeek.getDate() + 6);
-    endOfWeek.setHours(23, 59, 59, 999);
-
-    const startDate = startOfWeek.toISOString().split('T')[0];
-    const endDateStr = endOfWeek.toISOString().split('T')[0];
-
-    // Fetch scheduled games for the week from database
+    // Fetch next upcoming scheduled games from database
     const games = await prisma.$queryRaw<Array<{
       id: string;
       date: string;
@@ -66,9 +51,9 @@ export async function HeroGrid({ featuredArticles = [], featuredVideoPlaybackId 
     }>>`
       SELECT * FROM games_with_schools
       WHERE status = 'Scheduled'
-      AND date >= ${startDate}::date
-      AND date <= ${endDateStr}::date
+      AND date >= ${today}::date
       ORDER BY date ASC, sport, gender
+      LIMIT 20
     `;
 
     // Transform to match expected format
@@ -93,11 +78,6 @@ export async function HeroGrid({ featuredArticles = [], featuredVideoPlaybackId 
     console.error("Failed to fetch weekly games:", error);
   }
 
-  // Filter for Boys (Men's) games only
-  const mensGames = weeklyGames.filter(game =>
-    !game.gender || game.gender.toLowerCase() === "boys"
-  );
-
   return (
     <section className="container mx-auto px-4 pt-0 pb-8 md:pb-12 flex-1 flex items-stretch">
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4 w-full">
@@ -116,23 +96,12 @@ export async function HeroGrid({ featuredArticles = [], featuredVideoPlaybackId 
         <div className="flex flex-col gap-4 h-full">
           {/* Mux Video Player - Top Right (16:9 aspect ratio) */}
           <div className="relative rounded-lg overflow-hidden shadow-card bg-black aspect-video">
-            {/* {featuredVideoPlaybackId ? (
-              <MuxPlayer
-                playbackId={featuredVideoPlaybackId}
-                accentColor="#94d873"
-                className="w-full h-full"
-              />
-            ) : (
-              <div className="flex items-center justify-center h-full">
-                <p className="text-white/60 text-sm">No featured video</p>
-              </div>
-            )} */}
             <video src="/motion_logo.mp4" className="w-full h-full" autoPlay muted loop playsInline  />
           </div>
 
-          {/* Upcoming Men's Games Table - Bottom Right (takes remaining space) */}
+          {/* Upcoming Games Table - Bottom Right (takes remaining space) */}
           <div className="flex-1 min-h-0">
-            <UpcomingMensGamesTable games={mensGames} />
+            <UpcomingMensGamesTable games={weeklyGames} />
           </div>
         </div>
       </div>

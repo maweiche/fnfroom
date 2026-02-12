@@ -150,6 +150,153 @@ export async function extractJSONFromImage<T = any>(
   }
 }
 
+export interface DocumentSource {
+  data: string; // base64
+  mediaType: 'application/pdf';
+}
+
+/**
+ * Extract structured data from a PDF document using Claude
+ */
+export async function extractFromDocument(
+  documentSource: DocumentSource,
+  prompt: string,
+  options: ClaudeVisionOptions = {}
+): Promise<{
+  content: string;
+  usage: {
+    inputTokens: number;
+    outputTokens: number;
+  };
+  processingTimeMs: number;
+}> {
+  const startTime = Date.now();
+
+  try {
+    const documentContent = {
+      type: 'document' as const,
+      source: {
+        type: 'base64' as const,
+        media_type: documentSource.mediaType,
+        data: documentSource.data,
+      },
+    };
+
+    const response = await anthropic.messages.create({
+      model: options.model || 'claude-sonnet-4-20250514',
+      max_tokens: options.maxTokens || 4096,
+      temperature: options.temperature || 0,
+      messages: [
+        {
+          role: 'user',
+          content: [documentContent, { type: 'text', text: prompt }],
+        },
+      ],
+    });
+
+    const processingTimeMs = Date.now() - startTime;
+
+    const textContent = response.content
+      .filter((block) => block.type === 'text')
+      .map((block) => (block as { type: 'text'; text: string }).text)
+      .join('\n');
+
+    return {
+      content: textContent,
+      usage: {
+        inputTokens: response.usage.input_tokens,
+        outputTokens: response.usage.output_tokens,
+      },
+      processingTimeMs,
+    };
+  } catch (error) {
+    const processingTimeMs = Date.now() - startTime;
+
+    if (error instanceof Anthropic.APIError) {
+      throw new Error(
+        `Claude API Error (${error.status}): ${error.message}\n` +
+          `Processing time: ${processingTimeMs}ms`
+      );
+    }
+
+    throw new Error(
+      `Failed to extract from document: ${error}\n` +
+        `Processing time: ${processingTimeMs}ms`
+    );
+  }
+}
+
+/**
+ * Extract JSON from a PDF document using Claude
+ */
+export async function extractJSONFromDocument<T = any>(
+  documentSource: DocumentSource,
+  prompt: string,
+  options: ClaudeVisionOptions = {}
+): Promise<{
+  data: T;
+  raw: string;
+  usage: {
+    inputTokens: number;
+    outputTokens: number;
+  };
+  processingTimeMs: number;
+}> {
+  const jsonPrompt = `${prompt}\n\nIMPORTANT: Respond with ONLY valid JSON. No markdown, no explanations, just the JSON object.`;
+
+  const result = await extractFromDocument(documentSource, jsonPrompt, options);
+
+  try {
+    let jsonString = result.content.trim();
+
+    if (jsonString.startsWith('```json')) {
+      jsonString = jsonString.replace(/^```json\n/, '').replace(/\n```$/, '');
+    } else if (jsonString.startsWith('```')) {
+      jsonString = jsonString.replace(/^```\n/, '').replace(/\n```$/, '');
+    }
+
+    const data = JSON.parse(jsonString);
+
+    return {
+      data,
+      raw: result.content,
+      usage: result.usage,
+      processingTimeMs: result.processingTimeMs,
+    };
+  } catch (error) {
+    throw new Error(
+      `Failed to parse JSON from Claude response:\n${result.content}\n\nError: ${error}`
+    );
+  }
+}
+
+/**
+ * Load a file (image or PDF) and convert to base64
+ */
+export async function fileToBase64(
+  filePath: string
+): Promise<{ data: string; mediaType: string }> {
+  const file = Bun.file(filePath);
+  const buffer = await file.arrayBuffer();
+  const base64 = Buffer.from(buffer).toString('base64');
+
+  const ext = filePath.toLowerCase().split('.').pop();
+  const mediaType =
+    ext === 'pdf'
+      ? 'application/pdf'
+      : ext === 'png'
+        ? 'image/png'
+        : ext === 'jpg' || ext === 'jpeg'
+          ? 'image/jpeg'
+          : ext === 'gif'
+            ? 'image/gif'
+            : ext === 'webp'
+              ? 'image/webp'
+              : 'image/jpeg';
+
+  return { data: base64, mediaType };
+}
+
 /**
  * Load an image from a file path and convert to base64
  */
@@ -160,7 +307,6 @@ export async function imageFileToBase64(
   const buffer = await file.arrayBuffer();
   const base64 = Buffer.from(buffer).toString('base64');
 
-  // Detect media type from file extension
   const ext = filePath.toLowerCase().split('.').pop();
   const mediaType =
     ext === 'png'

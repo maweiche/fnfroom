@@ -9,13 +9,23 @@ export default function CreateUserPage() {
   const router = useRouter();
 
   const handleSubmit = async (data: any) => {
-    // TODO: Call API to create user
-    console.log("Creating user:", data);
+    const match = document.cookie.match(/(?:^|; )auth_token=([^;]*)/);
+    const token = match ? match[1] : null;
 
-    // Placeholder - simulate API call
-    await new Promise((resolve) => setTimeout(resolve, 1000));
+    const res = await fetch("/api/admin/users", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+      },
+      body: JSON.stringify(data),
+    });
 
-    // Redirect back to users list
+    if (!res.ok) {
+      const json = await res.json();
+      throw new Error(json.error || "Failed to create user");
+    }
+
     router.push("/admin/users");
   };
 

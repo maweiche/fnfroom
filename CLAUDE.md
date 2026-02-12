@@ -119,10 +119,11 @@ For more information, read the Bun API docs in `node_modules/bun-types/docs/**.m
 ## Project Architecture
 
 ### Overview
-Friday Night Film Room is a regional sports news outlet covering North Carolina high school basketball, football, and lacrosse. The site includes three main features:
+Friday Night Film Room is a regional sports news outlet covering North Carolina high school basketball, football, and lacrosse. The site includes four main features:
 1. **Editorial Content**: Articles, videos, rankings, and recruiting coverage powered by Sanity CMS
 2. **ScoreSnap**: AI-powered score upload system where coaches submit game photos that are extracted via Claude Vision API
 3. **Press Box AI**: Voice-to-article platform where coaches speak game recaps that are transformed into articles via Claude
+4. **Admin Panel**: Comprehensive admin interface for managing users, players, rosters, games, stats, schools, and college offers
 
 ### Data Architecture
 The site uses a **multi-source data strategy**:
@@ -167,6 +168,27 @@ bunx prisma studio  # Database GUI
 bunx prisma generate  # Regenerate client
 ```
 
+### User Management Scripts
+
+**Create a coach account:**
+```bash
+bun scripts/add-coach.ts <email> <name> [school]
+# Example: bun scripts/add-coach.ts coach@school.com "John Smith" "Central High"
+# Default temp password: TempPass123!
+```
+
+**Verify a coach account:**
+```bash
+bun scripts/verify-coach.ts <email>
+# Required before coach can log in to ScoreSnap
+```
+
+**Create a writer account:**
+```bash
+bun scripts/create-user.ts
+# Interactive prompts for writer/admin accounts
+```
+
 ### Key Directories
 
 - `app/` - Next.js App Router pages and API routes
@@ -176,8 +198,14 @@ bunx prisma generate  # Regenerate client
   - `app/scoresnap/` - ScoreSnap UI for coaches
   - `app/pressbox/` - Press Box AI UI for writers
   - `app/studio/` - Sanity Studio embedded route
+  - `app/admin/` - Admin panel interface (requires ADMIN role)
 - `components/` - Reusable React components
   - `components/pressbox/` - Press Box AI specific components
+  - `components/admin/` - Admin panel components
+    - `components/admin/layout/` - Admin sidebar and header
+    - `components/admin/shared/` - Reusable admin components (DataTable, FilterBar, ConfirmDialog)
+    - `components/admin/users/` - User management forms
+    - `components/admin/players/` - Player management forms
 - `lib/` - Shared utilities
   - `lib/auth.ts` - JWT authentication utilities
   - `lib/prisma.ts` - Prisma client singleton
@@ -233,6 +261,11 @@ bunx prisma generate  # Regenerate client
 
 The design system is fully documented in `.design-system/system.md`. Key principles:
 
+#### Critical Development Rules
+- **Never use `sm:` breakpoint** - Only use base (mobile), `md:`, and `lg:` breakpoints to maintain consistency
+- Always start mobile-first: `<div className="p-4 md:p-6 lg:p-8">` ✅
+- Never desktop-first: `<div className="p-8 sm:p-4">` ❌
+
 #### Colors
 - **Sport-specific accents**: Basketball (orange), Football (green), Lacrosse (blue)
 - **Brand primary**: `#94d873` (meadow green)
@@ -247,7 +280,6 @@ The design system is fully documented in `.design-system/system.md`. Key princip
 #### Spacing
 - 4px base grid: 4, 8, 12, 16, 24, 32, 48, 64px
 - Mobile-first: Start with mobile padding, scale up with `md:` and `lg:`
-- **Never use `sm:` breakpoint** to maintain consistency
 
 #### Components
 - Use `SportTag` component for consistent sport branding
@@ -296,14 +328,47 @@ if (!user) {
 ### Environment Variables
 
 Required in `.env.local`:
+
+**Database & Auth:**
 - `DATABASE_URL` - PostgreSQL connection string
 - `JWT_SECRET` - Secret for JWT signing
+
+**AI Configuration:**
 - `AI_PROVIDER` - AI provider selection: "gemini" (default) or "anthropic"
 - `GEMINI_API_KEY` - Google Gemini API key (required if using Gemini)
 - `ANTHROPIC_API_KEY` - Claude API key (required if using Anthropic)
+
+**Sanity CMS:**
 - `NEXT_PUBLIC_SANITY_PROJECT_ID` - Sanity project ID
 - `NEXT_PUBLIC_SANITY_DATASET` - Sanity dataset (usually "production")
+- `NEXT_PUBLIC_SANITY_API_VERSION` - API version (e.g., "2024-01-01")
 - `SANITY_API_TOKEN` - Sanity write token for uploads
+
+**Mux Video:**
+- `MUX_TOKEN_ID` - Mux token ID for video uploads
+- `MUX_TOKEN_SECRET` - Mux token secret
+
+**Site Configuration:**
+- `NEXT_PUBLIC_BASE_URL` - Base URL (http://localhost:3000 in dev)
+- `NEXT_PUBLIC_SITE_URL` - Production URL (https://fridaynightfilmroom.com)
+- `NEXT_PUBLIC_GOOGLE_SITE_VERIFICATION` - Google Search Console verification (optional)
+
+### Development Credentials
+
+**Admin Panel** at `/admin/login`:
+- Create admin accounts with `bun scripts/create-user.ts`
+- Role: ADMIN (auto-verified)
+- Access full admin interface
+
+**Press Box AI (Writers)** at `/pressbox/login`:
+- Email: `maweiche@gmail.com`
+- Password: `writer123`
+- Role: WRITER
+
+**ScoreSnap (Coaches)** at `/scoresnap/login`:
+- Default temp password: `TempPass123!`
+- Create coaches with `bun scripts/add-coach.ts`
+- Verify with `bun scripts/verify-coach.ts`
 
 ### Performance Targets
 - Lighthouse Performance: ≥90 on mobile
@@ -350,3 +415,68 @@ The Sanity Studio is embedded at `/studio`. To modify schemas:
 3. Generate article → `/api/pressbox/article/generate`
 4. Writer edits → saves to `articles` table
 5. Publish → exports to Sanity CMS (future feature)
+
+### Admin Panel Architecture
+
+The admin panel provides a comprehensive interface for managing all aspects of the platform.
+
+**Access Control:**
+- Protected route: `/admin/*` (requires ADMIN role)
+- Layout: `/app/admin/layout.tsx` checks JWT and role
+- Login: `/admin/login` (separate from coach/writer login)
+
+**Design System:**
+- Dark sidebar: `#1a1d29` (charcoal black)
+- Golden accents: `#E6BC6A` (spotlight gold)
+- Follows existing design system with admin-specific dark theme
+- Mobile-first responsive (no `sm:` breakpoint, only `md:` and `lg:`)
+
+**Pages:**
+1. **Dashboard** (`/admin/dashboard`) - Overview stats, quick actions, recent activity
+2. **Users** (`/admin/users`) - Manage all user accounts (Writers, Coaches, Players, Fans)
+3. **Player Claims** (`/admin/players/claims`) - Review player profile claim requests
+4. **Players** (`/admin/players`) - Search/manage player profiles, link to Sanity
+5. **Player Detail** (`/admin/players/[id]`) - Full player editor with stats and offers
+6. **Rosters** (`/admin/rosters`) - Manage team rosters by school/sport/season
+7. **Games** (`/admin/games`) - Manage game schedules and results
+8. **Stats** (`/admin/stats`) - Bulk import/export player statistics
+9. **Schools** (`/admin/schools`) - Manage NC high school directory
+10. **College Offers** (`/admin/offers`) - Verify player college offers
+11. **Audit Log** (`/admin/audit`) - Track all admin actions
+
+**Shared Components:**
+- `DataTable` - Sortable, filterable table with pagination
+- `FilterBar` - Multi-filter component with search
+- `ConfirmDialog` - Reusable confirmation modal
+- `UserForm` - Create/edit user accounts
+- `PlayerForm` - Edit player profiles
+
+**Database Models (Admin-Specific):**
+- `PlayerClaimRequest` - Players requesting account access
+- `CollegeOffer` - Player college offers (verified by admins)
+- `Roster` - Team rosters by school/sport/season
+- `AdminAuditLog` - All admin actions logged
+
+**Future API Routes (To Be Implemented):**
+- `GET /api/admin/stats` - Dashboard statistics
+- `GET /api/admin/users` - List users with filters
+- `POST /api/admin/users` - Create user account
+- `PATCH /api/admin/users/[id]` - Update user
+- `DELETE /api/admin/users/[id]` - Delete user
+- `GET /api/admin/players` - List players with filters
+- `PATCH /api/admin/players/[id]` - Update player profile
+- `POST /api/admin/players/[id]/link-sanity` - Link to Sanity profile
+- `GET /api/admin/claims` - List pending claims
+- `POST /api/admin/claims/[id]/approve` - Approve claim (creates user account)
+- `POST /api/admin/claims/[id]/reject` - Reject claim
+- `GET /api/admin/offers` - List unverified offers
+- `POST /api/admin/offers/[id]/verify` - Verify offer
+- `DELETE /api/admin/offers/[id]` - Reject/delete offer
+- `GET /api/admin/rosters` - List roster entries
+- `POST /api/admin/rosters` - Create roster entry
+- `GET /api/admin/games` - List games
+- `POST /api/admin/games` - Create game
+- `GET /api/admin/schools` - List schools
+- `POST /api/admin/schools` - Create school
+- `POST /api/admin/stats/import` - Bulk import stats
+- `GET /api/admin/audit` - List audit log entries
