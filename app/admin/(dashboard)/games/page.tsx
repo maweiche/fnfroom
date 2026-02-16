@@ -72,7 +72,10 @@ export default function GamesPage() {
       key: "date",
       label: "Date",
       sortable: true,
-      render: (value) => new Date(value).toLocaleDateString(),
+      render: (value) => {
+        const d = new Date(value);
+        return `${d.getUTCMonth() + 1}/${d.getUTCDate()}/${d.getUTCFullYear()}`;
+      },
     },
     {
       key: "sport",

@@ -1,7 +1,7 @@
 import Link from "next/link";
 import type { Metadata } from "next";
 import { SportTag } from "@/components/sport-tag";
-import { getLatestRankingsBySport } from "@/sanity/lib/fetch";
+import { getAllSheetRankings } from "@/lib/sheets-rankings";
 import { sportLabels } from "@/lib/utils";
 
 export const metadata: Metadata = {
@@ -11,23 +11,23 @@ export const metadata: Metadata = {
 };
 
 export default async function RankingsPage() {
-  const latestRankings = await getLatestRankingsBySport();
+  const allRankings = await getAllSheetRankings();
 
   const sports = [
     {
       sport: "basketball" as const,
       name: sportLabels.basketball,
-      rankings: latestRankings.basketball,
+      rankings: allRankings.basketball || [],
     },
     {
       sport: "football" as const,
       name: sportLabels.football,
-      rankings: latestRankings.football,
+      rankings: allRankings.football || [],
     },
     {
       sport: "lacrosse" as const,
       name: sportLabels.lacrosse,
-      rankings: latestRankings.lacrosse,
+      rankings: allRankings.lacrosse || [],
     },
   ];
 
@@ -55,33 +55,27 @@ export default async function RankingsPage() {
               <div className="p-6 bg-card border border-border rounded-lg hover:shadow-card transition-shadow duration-200">
                 <div className="flex items-start justify-between mb-4">
                   <SportTag sport={sport} />
-                  {rankings && (
-                    <span className="text-xs text-muted">
-                      Week {rankings.week}
-                    </span>
-                  )}
                 </div>
 
                 <h2 className="text-2xl font-bold mb-3 group-hover:text-primary transition-colors">
                   {name}
                 </h2>
 
-                {rankings ? (
+                {rankings.length > 0 ? (
                   <div>
                     <div className="mb-3">
                       <div className="text-sm text-secondary mb-1">
                         Current #1
                       </div>
                       <div className="text-lg font-semibold">
-                        {rankings.entries[0]?.team || "—"}
+                        {rankings[0].team}
                       </div>
                       <div className="text-sm text-muted font-mono">
-                        {rankings.entries[0]?.record || ""}
+                        {rankings[0].record}
                       </div>
                     </div>
                     <div className="text-sm text-muted">
-                      Updated{" "}
-                      {new Date(rankings.publishDate).toLocaleDateString()}
+                      {rankings.length} teams ranked
                     </div>
                   </div>
                 ) : (

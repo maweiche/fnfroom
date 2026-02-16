@@ -65,9 +65,12 @@ export async function POST(request: NextRequest) {
       const homeTeamId = game.isHome ? hostSchool.id : opponent.id;
       const awayTeamId = game.isHome ? opponent.id : hostSchool.id;
 
+      // Append T12:00:00Z to avoid timezone-shifting the date
+      const gameDate = new Date(`${game.date}T12:00:00Z`);
+
       const existing = await prisma.game.findFirst({
         where: {
-          date: new Date(game.date),
+          date: gameDate,
           sport: schedule.sport,
           homeTeamId,
           awayTeamId,
@@ -85,7 +88,7 @@ export async function POST(request: NextRequest) {
 
       await prisma.game.create({
         data: {
-          date: new Date(game.date),
+          date: gameDate,
           sport: schedule.sport,
           gender: schedule.gender || null,
           homeTeamId,

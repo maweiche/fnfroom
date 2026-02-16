@@ -1,21 +1,18 @@
 import { notFound } from "next/navigation";
 import type { Metadata } from "next";
+import Link from "next/link";
+import { TrendingUp, TrendingDown, Minus, Star } from "lucide-react";
 import { SportTag } from "@/components/sport-tag";
-import { RankingsTable } from "@/components/rankings-table";
-import { PortableTextRenderer } from "@/components/portable-text";
 import { sportLabels, type Sport } from "@/lib/utils";
-import { getRankingsBySport } from "@/sanity/lib/fetch";
+import { getSheetRankings } from "@/lib/sheets-rankings";
+import { prisma } from "@/lib/prisma";
 
 interface RankingsSportPageProps {
   params: Promise<{
     sport: string;
   }>;
-  searchParams: Promise<{
-    season?: string;
-  }>;
 }
 
-// Validate sport parameter
 function isValidSport(sport: string): sport is Sport {
   return ["basketball", "football", "lacrosse"].includes(sport);
 }
@@ -26,9 +23,7 @@ export async function generateMetadata({
   const { sport } = await params;
 
   if (!isValidSport(sport)) {
-    return {
-      title: "Rankings Not Found",
-    };
+    return { title: "Rankings Not Found" };
   }
 
   const sportName = sportLabels[sport];
@@ -41,22 +36,29 @@ export async function generateMetadata({
 
 export default async function RankingsSportPage({
   params,
-  searchParams,
 }: RankingsSportPageProps) {
   const { sport } = await params;
-  const { season } = await searchParams;
 
-  // Validate sport
   if (!isValidSport(sport)) {
     notFound();
   }
 
   const sportName = sportLabels[sport];
 
-  // Fetch all rankings for this sport
-  const allRankings = await getRankingsBySport(sport);
+  const [rankings, schools] = await Promise.all([
+    getSheetRankings(sport),
+    prisma.$queryRaw<{ name: string; key: string }[]>`
+      SELECT name, key FROM schools ORDER BY name
+    `,
+  ]);
 
-  if (allRankings.length === 0) {
+  // Build a lookup: lowercase school name → key
+  const schoolKeyMap = new Map<string, string>();
+  for (const s of schools) {
+    schoolKeyMap.set(s.name.toLowerCase(), s.key);
+  }
+
+  if (rankings.length === 0) {
     return (
       <div className="container mx-auto px-4 py-12">
         <div className="max-w-4xl mx-auto">
@@ -80,109 +82,117 @@ export default async function RankingsSportPage({
     );
   }
 
-  // Get unique seasons
-  const seasons = Array.from(
-    new Set(allRankings.map((r) => r.season))
-  ).sort((a, b) => b.localeCompare(a)); // Most recent first
-
-  // Determine which season to display
-  const displaySeason = season || seasons[0];
-
-  // Get rankings for selected season (sorted by week desc)
-  const seasonRankings = allRankings.filter((r) => r.season === displaySeason);
-  const latestRankings = seasonRankings[0]; // Most recent week
-
-  if (!latestRankings) {
-    notFound();
-  }
-
   return (
     <div className="container mx-auto px-4 py-12">
       <div className="max-w-5xl mx-auto">
         {/* Header */}
         <div className="mb-8">
           <SportTag sport={sport} className="mb-4" />
-          <div className="flex flex-col md:flex-row md:items-end md:justify-between gap-4">
-            <div>
-              <h1 className="text-4xl md:text-5xl font-bold mb-2">
-                {sportName} Rankings
-              </h1>
-              <p className="text-lg text-secondary">
-                Week {latestRankings.week} • {latestRankings.season}
-              </p>
-            </div>
-
-            {/* Season Selector */}
-            {seasons.length > 1 && (
-              <div>
-                <label
-                  htmlFor="season-select"
-                  className="text-sm text-secondary mb-2 block"
-                >
-                  Select Season
-                </label>
-                <select
-                  id="season-select"
-                  className="px-4 py-2 bg-card border border-border rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary"
-                  value={displaySeason}
-                  onChange={(e) => {
-                    const newSeason = e.target.value;
-                    window.location.href = `/rankings/${sport}?season=${newSeason}`;
-                  }}
-                >
-                  {seasons.map((s) => (
-                    <option key={s} value={s}>
-                      {s}
-                    </option>
-                  ))}
-                </select>
-              </div>
-            )}
-          </div>
-
-          <div className="text-sm text-muted mt-2">
-            Updated {new Date(latestRankings.publishDate).toLocaleDateString()}
-          </div>
+          <h1 className="text-4xl md:text-5xl font-bold mb-2">
+            {sportName} Rankings
+          </h1>
+          <p className="text-lg text-secondary">
+            {rankings.length} teams ranked
+          </p>
         </div>
-
-        {/* Editor's Note */}
-        {latestRankings.editorsNote && (
-          <div className="mb-8 p-6 bg-primary/5 border border-primary/20 rounded-lg">
-            <h2 className="text-lg font-bold mb-3">Editor's Note</h2>
-            <div className="prose prose-sm max-w-none">
-              <PortableTextRenderer content={latestRankings.editorsNote} />
-            </div>
-          </div>
-        )}
 
         {/* Rankings Table */}
-        <div className="bg-card border border-border rounded-lg overflow-hidden">
-          <RankingsTable entries={latestRankings.entries} />
-        </div>
+        <div className="bg-card border border-border rounded-lg overflow-hidden overflow-x-auto">
+          <table className="w-full border-collapse">
+            <thead>
+              <tr className="bg-muted/10 border-b-2 border-border">
+                <th className="text-left px-4 py-3 text-xs uppercase tracking-wide font-semibold text-secondary">
+                  Rank
+                </th>
+                <th className="text-left px-4 py-3 text-xs uppercase tracking-wide font-semibold text-secondary">
+                  Team
+                </th>
+                <th className="text-left px-4 py-3 text-xs uppercase tracking-wide font-semibold text-secondary hidden md:table-cell">
+                  Location
+                </th>
+                <th className="text-left px-4 py-3 text-xs uppercase tracking-wide font-semibold text-secondary">
+                  Record
+                </th>
+                <th className="text-left px-4 py-3 text-xs uppercase tracking-wide font-semibold text-secondary hidden md:table-cell">
+                  Rating
+                </th>
+                <th className="text-left px-4 py-3 text-xs uppercase tracking-wide font-semibold text-secondary hidden md:table-cell">
+                  Strength
+                </th>
+                <th className="text-center px-4 py-3 text-xs uppercase tracking-wide font-semibold text-secondary">
+                  +/-
+                </th>
+              </tr>
+            </thead>
+            <tbody className="text-sm">
+              {rankings.map((entry) => {
+                const schoolKey = schoolKeyMap.get(entry.team.toLowerCase());
+                const teamCell = schoolKey ? (
+                  <Link
+                    href={`/${sport}/teams/${schoolKey}`}
+                    className="font-medium text-foreground hover:text-primary transition-colors"
+                  >
+                    {entry.team}
+                  </Link>
+                ) : (
+                  <span className="font-medium">{entry.team}</span>
+                );
 
-        {/* Week Navigation */}
-        {seasonRankings.length > 1 && (
-          <div className="mt-8 p-6 bg-muted/10 border border-border rounded-lg">
-            <h3 className="font-semibold mb-3">Previous Weeks</h3>
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-              {seasonRankings.slice(1, 9).map((ranking) => (
-                <a
-                  key={ranking._id}
-                  href={`#week-${ranking.week}`}
-                  className="px-4 py-2 text-sm text-center bg-card border border-border rounded hover:border-primary transition-colors"
-                >
-                  Week {ranking.week}
-                  <span className="block text-xs text-muted mt-1">
-                    {new Date(ranking.publishDate).toLocaleDateString("en-US", {
-                      month: "short",
-                      day: "numeric",
-                    })}
-                  </span>
-                </a>
-              ))}
-            </div>
-          </div>
-        )}
+                return (
+                  <tr
+                    key={entry.rank}
+                    className="border-b border-border hover:bg-muted/5 transition-colors"
+                  >
+                    <td className="px-4 py-3 font-mono font-bold tabular-nums">
+                      {entry.rank}
+                    </td>
+                    <td className="px-4 py-3">{teamCell}</td>
+                    <td className="px-4 py-3 text-secondary hidden md:table-cell">
+                      {entry.location || "—"}
+                    </td>
+                    <td className="px-4 py-3 font-mono tabular-nums">
+                      {entry.record}
+                    </td>
+                    <td className="px-4 py-3 font-mono tabular-nums hidden md:table-cell">
+                      {entry.rating != null ? entry.rating.toFixed(2) : "—"}
+                    </td>
+                    <td className="px-4 py-3 font-mono tabular-nums hidden md:table-cell">
+                      {entry.strength != null
+                        ? entry.strength.toFixed(2)
+                        : "—"}
+                    </td>
+                    <td className="px-4 py-3">
+                      <div className="flex items-center justify-center gap-1">
+                        {entry.movement === "up" && (
+                          <>
+                            <TrendingUp className="w-4 h-4 text-success" />
+                            <span className="text-xs text-success font-mono">
+                              {entry.movementValue}
+                            </span>
+                          </>
+                        )}
+                        {entry.movement === "down" && (
+                          <>
+                            <TrendingDown className="w-4 h-4 text-error" />
+                            <span className="text-xs text-error font-mono">
+                              {entry.movementValue}
+                            </span>
+                          </>
+                        )}
+                        {entry.movement === "steady" && (
+                          <Minus className="w-4 h-4 text-muted" />
+                        )}
+                        {entry.movement === "new" && (
+                          <Star className="w-4 h-4 text-primary" />
+                        )}
+                      </div>
+                    </td>
+                  </tr>
+                );
+              })}
+            </tbody>
+          </table>
+        </div>
       </div>
     </div>
   );

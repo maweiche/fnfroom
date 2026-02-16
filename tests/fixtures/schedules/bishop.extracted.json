@@ -1,0 +1,209 @@
+{
+  "teamName": "Bishop McGuinness",
+  "sport": "LACROSSE",
+  "gender": "Boys",
+  "season": "2025-26",
+  "city": "Kernersville",
+  "classification": "NC Class 3A/2A/1A - West",
+  "conference": "Mid-State/Mid Piedmont/NW Piedmont",
+  "games": [
+    {
+      "date": "2026-02-25",
+      "time": "7:15 PM",
+      "opponent": "Reagan",
+      "opponentCity": "Pfafftown",
+      "isHome": true,
+      "isConference": false,
+      "location": "Bishop McGuinness High School"
+    },
+    {
+      "date": "2026-02-27",
+      "time": "6:45 PM",
+      "opponent": "Southwest Guilford",
+      "opponentCity": "High Point",
+      "isHome": true,
+      "isConference": false,
+      "location": "Bishop McGuinness High School"
+    },
+    {
+      "date": "2026-03-03",
+      "time": "7:15 PM",
+      "opponent": "Southeast Guilford",
+      "opponentCity": "Greensboro",
+      "isHome": true,
+      "isConference": false,
+      "location": "Bishop McGuinness High School"
+    },
+    {
+      "date": "2026-03-06",
+      "time": "7:15 PM",
+      "opponent": "East Forsyth",
+      "opponentCity": "Kernersville",
+      "isHome": false,
+      "isConference": false,
+      "location": "East Forsyth High School"
+    },
+    {
+      "date": "2026-03-10",
+      "time": "6:00 PM",
+      "opponent": "Cornerstone Charter Academy",
+      "opponentCity": "Greensboro",
+      "isHome": true,
+      "isConference": true,
+      "location": "Bishop McGuinness High School"
+    },
+    {
+      "date": "2026-03-12",
+      "time": "6:00 PM",
+      "opponent": "Williams",
+      "opponentCity": "Burlington",
+      "isHome": true,
+      "isConference": false,
+      "location": "Bishop McGuinness High School"
+    },
+    {
+      "date": "2026-03-13",
+      "time": "6:00 PM",
+      "opponent": "Western Alamance",
+      "opponentCity": "Elon",
+      "isHome": false,
+      "isConference": false,
+      "location": "Western Alamance High School"
+    },
+    {
+      "date": "2026-03-17",
+      "time": "6:45 PM",
+      "opponent": "West Stokes",
+      "opponentCity": "King",
+      "isHome": true,
+      "isConference": true,
+      "location": "Bishop McGuinness High School"
+    },
+    {
+      "date": "2026-03-20",
+      "time": "6:45 PM",
+      "opponent": "North Davidson",
+      "opponentCity": "Lexington",
+      "isHome": true,
+      "isConference": true,
+      "location": "Bishop McGuinness High School"
+    },
+    {
+      "date": "2026-03-23",
+      "time": "6:00 PM",
+      "opponent": "Western Guilford",
+      "opponentCity": "Greensboro",
+      "isHome": false,
+      "isConference": false,
+      "location": "Western Guilford High School"
+    },
+    {
+      "date": "2026-03-24",
+      "time": "6:45 PM",
+      "opponent": "High Point Central",
+      "opponentCity": "High Point",
+      "isHome": false,
+      "isConference": true,
+      "location": "High Point Central High School"
+    },
+    {
+      "date": "2026-03-27",
+      "time": "6:45 PM",
+      "opponent": "Atkins",
+      "opponentCity": "Winston-Salem",
+      "isHome": false,
+      "isConference": true,
+      "location": "Atkins High School"
+    },
+    {
+      "date": "2026-03-30",
+      "time": "7:15 PM",
+      "opponent": "West Forsyth",
+      "opponentCity": "Clemmons",
+      "isHome": false,
+      "isConference": false,
+      "location": "West Forsyth High School"
+    },
+    {
+      "date": "2026-03-31",
+      "time": "6:45 PM",
+      "opponent": "Glenn",
+      "opponentCity": "Kernersville",
+      "isHome": true,
+      "isConference": true,
+      "location": "Bishop McGuinness High School"
+    },
+    {
+      "date": "2026-04-14",
+      "time": "6:45 PM",
+      "opponent": "Mount Tabor",
+      "opponentCity": "Winston-Salem",
+      "isHome": false,
+      "isConference": false,
+      "location": "Mount Tabor High School"
+    },
+    {
+      "date": "2026-04-17",
+      "time": "6:45 PM",
+      "opponent": "High Point Central",
+      "opponentCity": "High Point",
+      "isHome": true,
+      "isConference": true,
+      "location": "Bishop McGuinness High School"
+    },
+    {
+      "date": "2026-04-21",
+      "time": "6:45 PM",
+      "opponent": "Atkins",
+      "opponentCity": "Winston-Salem",
+      "isHome": true,
+      "isConference": true,
+      "location": "Bishop McGuinness High School"
+    },
+    {
+      "date": "2026-04-22",
+      "time": "6:45 PM",
+      "opponent": "Glenn",
+      "opponentCity": "Kernersville",
+      "isHome": false,
+      "isConference": true,
+      "location": "Glenn High School"
+    },
+    {
+      "date": "2026-04-29",
+      "time": "6:45 PM",
+      "opponent": "North Davidson",
+      "opponentCity": "Lexington",
+      "isHome": false,
+      "isConference": true,
+      "location": "North Davidson High School"
+    },
+    {
+      "date": "2026-04-30",
+      "time": "6:00 PM",
+      "opponent": "Cornerstone Charter Academy",
+      "opponentCity": "Greensboro",
+      "isHome": false,
+      "isConference": true,
+      "location": "Cornerstone Charter Academy"
+    },
+    {
+      "date": "2026-05-04",
+      "time": "6:45 PM",
+      "opponent": "West Stokes",
+      "opponentCity": "King",
+      "isHome": false,
+      "isConference": true,
+      "location": "West Stokes High School"
+    },
+    {
+      "date": "2026-05-07",
+      "time": "6:45 PM",
+      "opponent": "Mount Tabor",
+      "opponentCity": "Winston-Salem",
+      "isHome": true,
+      "isConference": false,
+      "location": "Bishop McGuinness High School"
+    }
+  ]
+}

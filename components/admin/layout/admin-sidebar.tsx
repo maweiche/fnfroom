@@ -60,6 +60,11 @@ const navItems: NavItem[] = [
     icon: Upload,
   },
   {
+    name: "Roster Upload",
+    href: "/admin/roster-upload",
+    icon: Upload,
+  },
+  {
     name: "Stats",
     href: "/admin/stats",
     icon: BarChart3,

@@ -52,17 +52,40 @@ export function Navigation() {
     }
   };
 
-  // Sport links (always visible on desktop)
-  const sportLinks = [
-    { href: "/basketball", label: "Basketball", color: "basketball" },
-    { href: "/football", label: "Football", color: "football" },
-    { href: "/lacrosse", label: "Lacrosse", color: "lacrosse" },
+  // Sport dropdown configs
+  const sportDropdowns = [
+    {
+      label: "Basketball",
+      color: "basketball",
+      links: [
+        { href: "/basketball", label: "Articles" },
+        { href: "/basketball/teams", label: "Teams" },
+        { href: "/rankings/basketball", label: "Rankings" },
+      ],
+    },
+    {
+      label: "Football",
+      color: "football",
+      links: [
+        { href: "/football", label: "Articles" },
+        { href: "/football/teams", label: "Teams" },
+        { href: "/rankings/football", label: "Rankings" },
+      ],
+    },
+    {
+      label: "Lacrosse",
+      color: "lacrosse",
+      links: [
+        { href: "/lacrosse", label: "Articles" },
+        { href: "/lacrosse/teams", label: "Teams" },
+        { href: "/rankings/lacrosse", label: "Rankings" },
+      ],
+    },
   ];
 
   // Content dropdown links
   const contentLinks = [
     { href: "/video", label: "Video" },
-    { href: "/rankings", label: "Rankings" },
     { href: "/recruiting", label: "Recruiting" },
     { href: "/college", label: "College Corner" },
     { href: "/beer-cooler", label: "Beer Cooler" },
@@ -77,10 +100,8 @@ export function Navigation() {
   ];
 
   // For mobile menu - combine all links with grouping
-  const mobileMainLinks = [
-    ...sportLinks,
+  const mobileContentLinks = [
     { href: "/video", label: "Video", color: "primary" },
-    { href: "/rankings", label: "Rankings", color: "primary" },
     { href: "/recruiting", label: "Recruiting", color: "primary" },
     { href: "/college", label: "College Corner", color: "primary" },
     { href: "/beer-cooler", label: "Beer Cooler", color: "primary" },
@@ -88,7 +109,18 @@ export function Navigation() {
 
   const isActive = (href: string) => {
     if (href === "/") return pathname === "/";
-    return pathname.startsWith(href);
+    if (pathname === href) return true;
+    if (!pathname.startsWith(href)) return false;
+    // For sport hub links (e.g., /basketball), don't match /basketball/teams
+    const sportHubPattern = /^\/(basketball|football|lacrosse)$/;
+    if (sportHubPattern.test(href) && pathname.startsWith(href + "/teams")) {
+      return false;
+    }
+    return true;
+  };
+
+  const isSportActive = (sport: typeof sportDropdowns[number]) => {
+    return sport.links.some((link) => isActive(link.href));
   };
 
   const getSportAccentClass = (color: string, isActive: boolean) => {
@@ -131,36 +163,56 @@ export function Navigation() {
 
             {/* Desktop Navigation - Hidden on Mobile */}
             <nav className="hidden lg:flex items-center gap-1">
-              {/* Sport Links - Always Visible */}
-              {sportLinks.map((link) => {
-                const active = isActive(link.href);
+              {/* Sport Dropdowns */}
+              {sportDropdowns.map((sport) => {
+                const active = isSportActive(sport);
                 return (
-                  <Link
-                    key={link.href}
-                    href={link.href}
-                    className={`relative px-4 py-2 text-sm font-medium transition-colors duration-150 group ${
-                      active
-                        ? getSportAccentClass(link.color, true) + " font-semibold"
-                        : "text-secondary hover:text-foreground"
-                    }`}
-                  >
-                    {link.label}
-                    {active && (
-                      <motion.div
-                        layoutId="activeTab"
-                        className={`absolute bottom-0 left-0 right-0 h-0.5 ${
-                          link.color === "basketball"
-                            ? "bg-[#D97B34]"
-                            : link.color === "football"
-                              ? "bg-[#2d5a3d] dark:bg-[#4c8a5f]"
-                              : link.color === "lacrosse"
-                                ? "bg-[#1e3a5f] dark:bg-[#4a6b9e]"
-                                : "bg-primary"
-                        }`}
-                        transition={{ type: "spring", stiffness: 500, damping: 30 }}
-                      />
-                    )}
-                  </Link>
+                  <DropdownMenu key={sport.label}>
+                    <DropdownMenuTrigger
+                      className={`relative flex items-center gap-1 px-4 py-2 text-sm font-medium transition-colors duration-150 outline-none ${
+                        active
+                          ? getSportAccentClass(sport.color, true) + " font-semibold"
+                          : "text-secondary hover:text-foreground"
+                      }`}
+                    >
+                      {sport.label}
+                      <ChevronDown className="w-3.5 h-3.5" />
+                      {active && (
+                        <motion.div
+                          layoutId="activeTab"
+                          className={`absolute bottom-0 left-0 right-0 h-0.5 ${
+                            sport.color === "basketball"
+                              ? "bg-[#D97B34]"
+                              : sport.color === "football"
+                                ? "bg-[#2d5a3d] dark:bg-[#4c8a5f]"
+                                : sport.color === "lacrosse"
+                                  ? "bg-[#1e3a5f] dark:bg-[#4a6b9e]"
+                                  : "bg-primary"
+                          }`}
+                          transition={{ type: "spring", stiffness: 500, damping: 30 }}
+                        />
+                      )}
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent
+                      align="start"
+                      className="w-44 bg-card border-border"
+                    >
+                      {sport.links.map((link) => (
+                        <DropdownMenuItem key={link.href} asChild>
+                          <Link
+                            href={link.href}
+                            className={`w-full cursor-pointer ${
+                              isActive(link.href)
+                                ? getSportAccentClass(sport.color, true) + " font-semibold"
+                                : "text-foreground"
+                            }`}
+                          >
+                            {link.label}
+                          </Link>
+                        </DropdownMenuItem>
+                      ))}
+                    </DropdownMenuContent>
+                  </DropdownMenu>
                 );
               })}
 
@@ -284,48 +336,79 @@ export function Navigation() {
               onClick={(e) => e.stopPropagation()}
             >
               <div className="p-6">
-                {/* Main Navigation */}
-                <nav className="space-y-1">
-                  <div className="text-xs font-semibold text-muted uppercase tracking-wider mb-3">
-                    Coverage
+                {/* Sport Sections */}
+                {sportDropdowns.map((sport) => (
+                  <nav key={sport.label} className="mb-6">
+                    <div
+                      className={`text-xs font-semibold uppercase tracking-wider mb-2 ${
+                        sport.color === "basketball"
+                          ? "text-[#D97B34]"
+                          : sport.color === "football"
+                            ? "text-[#2d5a3d] dark:text-[#4c8a5f]"
+                            : "text-[#1e3a5f] dark:text-[#4a6b9e]"
+                      }`}
+                    >
+                      {sport.label}
+                    </div>
+                    {sport.links.map((link) => {
+                      const active = isActive(link.href);
+                      return (
+                        <Link
+                          key={link.href}
+                          href={link.href}
+                          onClick={() => setMenuOpen(false)}
+                          className={`group flex items-center justify-between px-4 py-2.5 rounded-lg font-medium transition-all duration-150 ${
+                            active
+                              ? "bg-primary/10 " +
+                                getSportAccentClass(sport.color, true)
+                              : "hover:bg-muted/10 text-foreground"
+                          }`}
+                        >
+                          <span className="text-sm">{link.label}</span>
+                          {active && (
+                            <span
+                              className={`w-1.5 h-1.5 rounded-full ${
+                                sport.color === "basketball"
+                                  ? "bg-[#D97B34]"
+                                  : sport.color === "football"
+                                    ? "bg-[#2d5a3d] dark:bg-[#4c8a5f]"
+                                    : "bg-[#1e3a5f] dark:bg-[#4a6b9e]"
+                              }`}
+                            />
+                          )}
+                        </Link>
+                      );
+                    })}
+                  </nav>
+                ))}
+
+                {/* Content Links */}
+                <nav className="mb-6 pt-4 border-t border-border">
+                  <div className="text-xs font-semibold text-muted uppercase tracking-wider mb-2">
+                    Content
                   </div>
-                  {mobileMainLinks.map((link) => {
+                  {mobileContentLinks.map((link) => {
                     const active = isActive(link.href);
                     return (
                       <Link
                         key={link.href}
                         href={link.href}
                         onClick={() => setMenuOpen(false)}
-                        className={`group flex items-center justify-between px-4 py-3 rounded-lg font-medium transition-all duration-150 ${
+                        className={`group flex items-center justify-between px-4 py-2.5 rounded-lg font-medium transition-all duration-150 ${
                           active
-                            ? "bg-primary/10 " + getSportAccentClass(link.color, true)
+                            ? "bg-primary/10 text-primary"
                             : "hover:bg-muted/10 text-foreground"
                         }`}
                       >
-                        <span className="text-base">{link.label}</span>
-                        {active && (
-                          <motion.span
-                            layoutId="activeDot"
-                            className={`w-2 h-2 rounded-full ${
-                              link.color === "basketball"
-                                ? "bg-[#D97B34]"
-                                : link.color === "football"
-                                  ? "bg-[#2d5a3d] dark:bg-[#4c8a5f]"
-                                  : link.color === "lacrosse"
-                                    ? "bg-[#1e3a5f] dark:bg-[#4a6b9e]"
-                                    : "bg-primary"
-                            }`}
-                            transition={{ type: "spring", stiffness: 500, damping: 30 }}
-                          />
-                        )}
+                        <span className="text-sm">{link.label}</span>
                       </Link>
                     );
                   })}
                 </nav>
 
                 {/* Utility Links */}
-                <nav className="mt-8 space-y-1 pt-6 border-t border-border">
-                  <div className="text-xs font-semibold text-muted uppercase tracking-wider mb-3">
+                <nav className="pt-4 border-t border-border">
+                  <div className="text-xs font-semibold text-muted uppercase tracking-wider mb-2">
                     More
                   </div>
                   {aboutLinks.map((link) => {
@@ -335,7 +418,7 @@ export function Navigation() {
                         key={link.href}
                         href={link.href}
                         onClick={() => setMenuOpen(false)}
-                        className={`group flex items-center justify-between px-4 py-3 rounded-lg font-medium transition-all duration-150 ${
+                        className={`group flex items-center justify-between px-4 py-2.5 rounded-lg font-medium transition-all duration-150 ${
                           active
                             ? "bg-primary/10 text-primary"
                             : "hover:bg-muted/10 text-secondary"
