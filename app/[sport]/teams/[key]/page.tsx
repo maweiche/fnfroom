@@ -90,7 +90,8 @@ interface RawRosterRow {
 export async function generateMetadata({
   params,
 }: TeamPageProps): Promise<Metadata> {
-  const { sport, key } = await params;
+  const { sport, key: rawKey } = await params;
+  const key = decodeURIComponent(rawKey);
 
   if (!isValidSport(sport)) {
     return { title: "Team Not Found" };
@@ -129,7 +130,8 @@ export async function generateMetadata({
 // --- Page ---
 
 export default async function TeamPage({ params }: TeamPageProps) {
-  const { sport, key } = await params;
+  const { sport, key: rawKey } = await params;
+  const key = decodeURIComponent(rawKey);
 
   if (!isValidSport(sport)) {
     notFound();

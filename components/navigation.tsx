@@ -85,9 +85,9 @@ export function Navigation() {
 
   // Content dropdown links
   const contentLinks = [
-    { href: "/video", label: "Video" },
-    { href: "/recruiting", label: "Recruiting" },
-    { href: "/college", label: "College Corner" },
+    // { href: "/video", label: "Video" },
+    // { href: "/recruiting", label: "Recruiting" },
+    // { href: "/college", label: "College Corner" },
     { href: "/beer-cooler", label: "Beer Cooler" },
   ];
 
@@ -95,14 +95,14 @@ export function Navigation() {
   const aboutLinks = [
     { href: "/staff", label: "Staff" },
     { href: "/faq", label: "FAQ" },
-    { href: "/scoresnap", label: "ScoreSnap" },
-    { href: "/pressbox", label: "Press Box AI" },
+    // { href: "/scoresnap", label: "ScoreSnap" },
+    // { href: "/pressbox", label: "Press Box AI" },
   ];
 
   // For mobile menu - combine all links with grouping
   const mobileContentLinks = [
-    { href: "/video", label: "Video", color: "primary" },
-    { href: "/recruiting", label: "Recruiting", color: "primary" },
+    // { href: "/video", label: "Video", color: "primary" },
+    // { href: "/recruiting", label: "Recruiting", color: "primary" },
     { href: "/college", label: "College Corner", color: "primary" },
     { href: "/beer-cooler", label: "Beer Cooler", color: "primary" },
   ];

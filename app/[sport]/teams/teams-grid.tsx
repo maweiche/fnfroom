@@ -1,8 +1,8 @@
 "use client";
 
-import { useState, useMemo } from "react";
+import { useState, useMemo, useCallback } from "react";
 import Link from "next/link";
-import { Search, Trophy, MapPin, Filter } from "lucide-react";
+import { Search, Trophy, MapPin, Filter, ChevronUp, ChevronDown, ChevronsUpDown } from "lucide-react";
 import type { Sport } from "@/lib/utils";
 
 interface Team {
@@ -26,6 +26,9 @@ interface TeamsGridProps {
   classifications: string[];
   conferences: string[];
 }
+
+type SortColumn = "rank" | "name" | "record" | "classification" | "conference";
+type SortDirection = "asc" | "desc";
 
 const sportAccentClasses: Record<Sport, { bg: string; text: string; border: string; badge: string }> = {
   basketball: {
@@ -57,10 +60,21 @@ export function TeamsGrid({
   const [search, setSearch] = useState("");
   const [classification, setClassification] = useState("");
   const [conference, setConference] = useState("");
+  const [sortColumn, setSortColumn] = useState<SortColumn>("rank");
+  const [sortDirection, setSortDirection] = useState<SortDirection>("asc");
   const accent = sportAccentClasses[sport];
 
+  const toggleSort = useCallback((column: SortColumn) => {
+    if (sortColumn === column) {
+      setSortDirection((d) => (d === "asc" ? "desc" : "asc"));
+    } else {
+      setSortColumn(column);
+      setSortDirection(column === "name" ? "asc" : "asc");
+    }
+  }, [sortColumn]);
+
   const filteredTeams = useMemo(() => {
-    return teams.filter((team) => {
+    const filtered = teams.filter((team) => {
       const matchesSearch =
         !search ||
         team.name.toLowerCase().includes(search.toLowerCase()) ||
@@ -70,7 +84,48 @@ export function TeamsGrid({
       const matchesConf = !conference || team.conference === conference;
       return matchesSearch && matchesClass && matchesConf;
     });
-  }, [teams, search, classification, conference]);
+
+    return [...filtered].sort((a, b) => {
+      const dir = sortDirection === "asc" ? 1 : -1;
+
+      switch (sortColumn) {
+        case "rank": {
+          if (a.rank && b.rank) return (a.rank - b.rank) * dir;
+          if (a.rank && !b.rank) return -1 * dir;
+          if (!a.rank && b.rank) return 1 * dir;
+          return a.name.localeCompare(b.name);
+        }
+        case "name":
+          return a.name.localeCompare(b.name) * dir;
+        case "record": {
+          const aTotal = a.wins + a.losses + a.ties;
+          const bTotal = b.wins + b.losses + b.ties;
+          const aWinPct = aTotal > 0 ? a.wins / aTotal : -1;
+          const bWinPct = bTotal > 0 ? b.wins / bTotal : -1;
+          if (aWinPct === bWinPct) return (b.wins - a.wins) * dir;
+          return (aWinPct - bWinPct) * dir;
+        }
+        case "classification": {
+          const aVal = a.classification ?? "";
+          const bVal = b.classification ?? "";
+          if (!aVal && !bVal) return 0;
+          if (!aVal) return 1;
+          if (!bVal) return -1;
+          return aVal.localeCompare(bVal) * dir;
+        }
+        case "conference": {
+          const aVal = a.conference ?? "";
+          const bVal = b.conference ?? "";
+          if (!aVal && !bVal) return 0;
+          if (!aVal) return 1;
+          if (!bVal) return -1;
+          return aVal.localeCompare(bVal) * dir;
+        }
+        default:
+          return 0;
+      }
+    });
+  }, [teams, search, classification, conference, sortColumn, sortDirection]);
 
   const hasActiveFilters = search || classification || conference;
 
@@ -147,21 +202,32 @@ export function TeamsGrid({
       <div className="bg-card border border-border rounded-lg overflow-hidden">
         {/* Table Header */}
         <div className="hidden md:grid md:grid-cols-12 gap-4 px-4 py-3 border-b border-border bg-muted/5">
-          <div className="col-span-1 text-xs font-semibold text-muted uppercase tracking-wide">
-            Rank
-          </div>
-          <div className="col-span-4 text-xs font-semibold text-muted uppercase tracking-wide">
-            Team
-          </div>
-          <div className="col-span-2 text-xs font-semibold text-muted uppercase tracking-wide">
-            Record
-          </div>
-          <div className="col-span-2 text-xs font-semibold text-muted uppercase tracking-wide">
-            Classification
-          </div>
-          <div className="col-span-3 text-xs font-semibold text-muted uppercase tracking-wide">
-            Conference
-          </div>
+          {([
+            { key: "rank" as SortColumn, label: "Rank", spanClass: "col-span-1" },
+            { key: "name" as SortColumn, label: "Team", spanClass: "col-span-4" },
+            { key: "record" as SortColumn, label: "Record", spanClass: "col-span-2" },
+            { key: "classification" as SortColumn, label: "Class", spanClass: "col-span-2" },
+            { key: "conference" as SortColumn, label: "Conference", spanClass: "col-span-3" },
+          ]).map((col) => (
+            <button
+              key={col.key}
+              onClick={() => toggleSort(col.key)}
+              className={`${col.spanClass} flex items-center gap-1 text-xs font-semibold uppercase tracking-wide transition-colors cursor-pointer ${
+                sortColumn === col.key ? "text-foreground" : "text-muted hover:text-secondary"
+              }`}
+            >
+              {col.label}
+              {sortColumn === col.key ? (
+                sortDirection === "asc" ? (
+                  <ChevronUp className="w-3 h-3" />
+                ) : (
+                  <ChevronDown className="w-3 h-3" />
+                )
+              ) : (
+                <ChevronsUpDown className="w-3 h-3 opacity-40" />
+              )}
+            </button>
+          ))}
         </div>
 
         {/* Team Rows */}
