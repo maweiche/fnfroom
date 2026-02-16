@@ -25,13 +25,11 @@ function getCurrentSeason(): string {
   const month = now.getMonth();
   // School year starts in August (month 7)
   if (month >= 7) {
-    const start = year % 100;
     const end = (year + 1) % 100;
-    return `${start}-${end.toString().padStart(2, "0")}`;
+    return `${year}-${end.toString().padStart(2, "0")}`;
   }
-  const start = (year - 1) % 100;
   const end = year % 100;
-  return `${start}-${end.toString().padStart(2, "0")}`;
+  return `${year - 1}-${end.toString().padStart(2, "0")}`;
 }
 
 // --- DB row types ---
