@@ -41,7 +41,11 @@ export default async function HomePage() {
         record: entry.record,
         trend: entry.trend as "up" | "down" | "steady",
       })),
-      lastUpdated: new Date(ranking!.publishDate).toLocaleDateString("en-US", {
+      lastUpdated: new Date(
+        /^\d{4}-\d{2}-\d{2}$/.test(ranking!.publishDate)
+          ? ranking!.publishDate + "T12:00:00"
+          : ranking!.publishDate
+      ).toLocaleDateString("en-US", {
         month: "short",
         day: "numeric",
       }),
@@ -73,7 +77,7 @@ export default async function HomePage() {
       {rankings.length > 0 && <RankingsSnapshot rankings={rankings} />}
 
       {/* Newsletter CTA */}
-      <NewsletterCTA />
+      {/* <NewsletterCTA /> */}
     </div>
   );
 }

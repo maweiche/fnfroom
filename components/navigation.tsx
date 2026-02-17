@@ -79,20 +79,22 @@ export function Navigation() {
         { href: "/lacrosse", label: "Articles" },
         { href: "/lacrosse/teams", label: "Teams" },
         { href: "/rankings/lacrosse", label: "Rankings" },
+        { href: "/beer-cooler", label: "Beer Cooler", color: "primary" },
       ],
     },
   ];
 
   // Content dropdown links
-  const contentLinks = [
+  // const contentLinks = [
     // { href: "/video", label: "Video" },
     // { href: "/recruiting", label: "Recruiting" },
     // { href: "/college", label: "College Corner" },
-    { href: "/beer-cooler", label: "Beer Cooler" },
-  ];
+    // { href: "/beer-cooler", label: "Beer Cooler" },
+  // ];
 
   // About dropdown links
   const aboutLinks = [
+    
     { href: "/staff", label: "Staff" },
     { href: "/faq", label: "FAQ" },
     // { href: "/scoresnap", label: "ScoreSnap" },
@@ -100,12 +102,12 @@ export function Navigation() {
   ];
 
   // For mobile menu - combine all links with grouping
-  const mobileContentLinks = [
+  // const mobileContentLinks = [
     // { href: "/video", label: "Video", color: "primary" },
     // { href: "/recruiting", label: "Recruiting", color: "primary" },
-    { href: "/college", label: "College Corner", color: "primary" },
-    { href: "/beer-cooler", label: "Beer Cooler", color: "primary" },
-  ];
+    // { href: "/college", label: "College Corner", color: "primary" },
+    
+  // ];
 
   const isActive = (href: string) => {
     if (href === "/") return pathname === "/";
@@ -217,12 +219,12 @@ export function Navigation() {
               })}
 
               {/* Content Dropdown */}
-              <DropdownMenu>
+              {/* <DropdownMenu>
                 <DropdownMenuTrigger className="flex items-center gap-1 px-4 py-2 text-sm font-medium text-secondary hover:text-foreground transition-colors duration-150 outline-none">
                   Content
                   <ChevronDown className="w-4 h-4" />
-                </DropdownMenuTrigger>
-                <DropdownMenuContent
+                </DropdownMenuTrigger> */}
+                {/* <DropdownMenuContent
                   align="start"
                   className="w-48 bg-card border-border"
                 >
@@ -240,8 +242,8 @@ export function Navigation() {
                       </Link>
                     </DropdownMenuItem>
                   ))}
-                </DropdownMenuContent>
-              </DropdownMenu>
+                </DropdownMenuContent> */}
+              {/* </DropdownMenu> */}
 
               {/* About Dropdown */}
               <DropdownMenu>
@@ -383,7 +385,7 @@ export function Navigation() {
                 ))}
 
                 {/* Content Links */}
-                <nav className="mb-6 pt-4 border-t border-border">
+                {/* <nav className="mb-6 pt-4 border-t border-border">
                   <div className="text-xs font-semibold text-muted uppercase tracking-wider mb-2">
                     Content
                   </div>
@@ -404,7 +406,7 @@ export function Navigation() {
                       </Link>
                     );
                   })}
-                </nav>
+                </nav> */}
 
                 {/* Utility Links */}
                 <nav className="pt-4 border-t border-border">

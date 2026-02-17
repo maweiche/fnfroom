@@ -110,7 +110,7 @@ export function UpcomingGamesClient({ games }: UpcomingGamesClientProps) {
       }>
         {filteredGames.length > 0 ? (
           filteredGames.map((game) => {
-            const gameDate = new Date(game.date);
+            const gameDate = new Date(game.date + "T12:00:00");
             const formattedDate = gameDate.toLocaleDateString("en-US", {
               weekday: "short",
               month: "short",

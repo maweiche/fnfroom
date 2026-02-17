@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
-import { Inter, JetBrains_Mono, Space_Grotesk } from "next/font/google";
+import { Inter, JetBrains_Mono } from "next/font/google";
+import localFont from "next/font/local";
 import "./globals.css";
 import { Footer } from "@/components/footer";
 import { AuthProvider } from "@/lib/auth-context";
@@ -19,11 +20,19 @@ const jetbrainsMono = JetBrains_Mono({
   display: "swap",
 });
 
-const spaceGrotesk = Space_Grotesk({
-  subsets: ["latin"],
-  variable: "--font-space-grotesk",
+const lemonMilk = localFont({
+  src: [
+    { path: "../assets/fonts/lemon_milk/LEMONMILK-Light.otf", weight: "300", style: "normal" },
+    { path: "../assets/fonts/lemon_milk/LEMONMILK-LightItalic.otf", weight: "300", style: "italic" },
+    { path: "../assets/fonts/lemon_milk/LEMONMILK-Regular.otf", weight: "400", style: "normal" },
+    { path: "../assets/fonts/lemon_milk/LEMONMILK-RegularItalic.otf", weight: "400", style: "italic" },
+    { path: "../assets/fonts/lemon_milk/LEMONMILK-Medium.otf", weight: "500", style: "normal" },
+    { path: "../assets/fonts/lemon_milk/LEMONMILK-MediumItalic.otf", weight: "500", style: "italic" },
+    { path: "../assets/fonts/lemon_milk/LEMONMILK-Bold.otf", weight: "700", style: "normal" },
+    { path: "../assets/fonts/lemon_milk/LEMONMILK-BoldItalic.otf", weight: "700", style: "italic" },
+  ],
+  variable: "--font-lemon-milk",
   display: "swap",
-  weight: ["700", "600"],
 });
 
 export const metadata: Metadata = {
@@ -107,7 +116,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className={`${inter.variable} ${jetbrainsMono.variable} ${spaceGrotesk.variable}`} suppressHydrationWarning>
+    <html lang="en" className={`${inter.variable} ${jetbrainsMono.variable} ${lemonMilk.variable}`} suppressHydrationWarning>
       <head>
         <script
           dangerouslySetInnerHTML={{

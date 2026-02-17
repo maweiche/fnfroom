@@ -72,7 +72,7 @@ export function CollegeUpdateCard({ update }: { update: CollegeUpdate }) {
             {update.highSchool} &apos;{update.classYear.slice(-2)}
           </span>
           <time className="text-xs text-muted">
-            {new Date(update.gameDate).toLocaleDateString("en-US", {
+            {new Date(update.gameDate + "T12:00:00").toLocaleDateString("en-US", {
               month: "short",
               day: "numeric",
             })}

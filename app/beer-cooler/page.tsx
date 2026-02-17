@@ -101,7 +101,7 @@ export default async function BeerCoolerPage() {
                   </span>
                   <span className="flex items-center gap-1">
                     <Clock className="w-4 h-4" />
-                    {new Date(update.gameDate).toLocaleDateString("en-US", {
+                    {new Date(update.gameDate + "T12:00:00").toLocaleDateString("en-US", {
                       month: "long",
                       day: "numeric",
                       year: "numeric",

@@ -29,37 +29,43 @@ export async function HeroGrid({ featuredArticles = [], featuredVideoPlaybackId 
       city: string;
       classification: string;
     };
+    homeScore: number | null;
+    awayScore: number | null;
     status: string;
   }> = [];
 
   try {
     const today = new Date().toISOString().split('T')[0];
 
-    // Fetch next upcoming scheduled games from database
+    // Fetch upcoming scheduled men's basketball & lacrosse games
     const games = await prisma.$queryRaw<Array<{
       id: string;
-      date: string;
+      date: Date;
       sport: string;
       gender: string | null;
       home_team: string;
       home_city: string;
       home_classification: string;
+      home_score: number | null;
       away_team: string;
       away_city: string;
       away_classification: string;
+      away_score: number | null;
       status: string;
     }>>`
       SELECT * FROM games_with_schools
       WHERE status = 'Scheduled'
       AND date >= ${today}::date
-      ORDER BY date ASC, sport, gender
+      AND LOWER(sport) IN ('basketball', 'lacrosse')
+      AND LOWER(COALESCE(gender, 'boys')) = 'boys'
+      ORDER BY date ASC, sport
       LIMIT 20
     `;
 
     // Transform to match expected format
     weeklyGames = games.map(game => ({
       id: game.id,
-      date: game.date,
+      date: game.date instanceof Date ? game.date.toISOString().split('T')[0] : String(game.date),
       sport: game.sport,
       gender: game.gender,
       homeTeam: {
@@ -72,6 +78,8 @@ export async function HeroGrid({ featuredArticles = [], featuredVideoPlaybackId 
         city: game.away_city,
         classification: game.away_classification,
       },
+      homeScore: game.home_score,
+      awayScore: game.away_score,
       status: game.status,
     }));
   } catch (error) {
@@ -179,7 +187,7 @@ function UpcomingMensGamesTable({ games }: UpcomingMensGamesTableProps) {
     <div className="rounded-lg bg-card border border-border shadow-card h-full flex flex-col overflow-hidden">
       {/* Header */}
       <div className="flex items-center justify-between px-4 py-3 border-b border-border bg-muted/20">
-        <h3 className="font-display font-bold text-base text-foreground">Upcoming Games</h3>
+        <h3 className="font-display font-bold text-base text-foreground">Men&apos;s Basketball & Lacrosse</h3>
         <Link
           href="/schedule"
           className="text-xs font-medium text-primary hover:text-primary/90 transition-colors"
@@ -196,18 +204,17 @@ function UpcomingMensGamesTable({ games }: UpcomingMensGamesTableProps) {
               <tr className="text-secondary uppercase tracking-wide">
                 <th className="text-left px-4 py-2 font-medium">Date</th>
                 <th className="text-left px-4 py-2 font-medium">Matchup</th>
+                <th className="text-left px-4 py-2 font-medium">Location</th>
                 <th className="text-center px-4 py-2 font-medium">Sport</th>
-                <th className="text-center px-4 py-2 font-medium">Class</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-border/30">
               {games.slice(0, 10).map((game) => {
-                const gameDate = new Date(game.date);
+                const gameDate = new Date(game.date + "T12:00:00");
                 const formattedDate = gameDate.toLocaleDateString("en-US", {
                   month: "short",
                   day: "numeric",
                 });
-
                 return (
                   <tr
                     key={game.id}
@@ -234,17 +241,18 @@ function UpcomingMensGamesTable({ games }: UpcomingMensGamesTableProps) {
                       </div>
                     </td>
 
+                    {/* Location */}
+                    <td className="px-4 py-3">
+                      <div className="flex items-center gap-1 text-secondary">
+                        <MapPin className="w-3 h-3 flex-shrink-0" />
+                        <span className="truncate">{game.homeTeam.city}</span>
+                      </div>
+                    </td>
+
                     {/* Sport */}
                     <td className="px-4 py-3 text-center">
                       <span className="inline-flex items-center px-2 py-0.5 rounded text-[10px] font-semibold bg-primary/10 text-primary">
                         {game.sport}
-                      </span>
-                    </td>
-
-                    {/* Classification */}
-                    <td className="px-4 py-3 text-center">
-                      <span className="font-mono text-[10px] text-muted">
-                        {game.homeTeam.classification} v {game.awayTeam.classification}
                       </span>
                     </td>
                   </tr>

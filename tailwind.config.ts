@@ -83,7 +83,7 @@ const config: Config = {
   				'sans-serif'
   			],
   			display: [
-  				'var(--font-space-grotesk)',
+  				'var(--font-lemon-milk)',
   				'system-ui',
   				'sans-serif'
   			],

@@ -34,7 +34,9 @@ export const sportColors: Record<Sport, string> = {
  * @returns Formatted date string (e.g., "Feb 8, 2026")
  */
 export function formatDate(dateString: string | Date): string {
-  const date = new Date(dateString);
+  const date = typeof dateString === "string" && /^\d{4}-\d{2}-\d{2}$/.test(dateString)
+    ? new Date(dateString + "T12:00:00")
+    : new Date(dateString);
   return date.toLocaleDateString("en-US", {
     month: "short",
     day: "numeric",
