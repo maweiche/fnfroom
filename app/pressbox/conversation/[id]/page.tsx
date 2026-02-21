@@ -2,6 +2,7 @@ import { redirect } from 'next/navigation';
 import { ConversationInterface } from '@/components/pressbox/conversation-interface';
 import { cookies } from 'next/headers';
 import { getUserFromToken } from '@/lib/auth';
+import { prisma } from '@/lib/prisma';
 
 async function getAuthUser() {
   const cookieStore = await cookies();
@@ -17,20 +18,6 @@ async function getAuthUser() {
   return { user, token };
 }
 
-async function getConversation(id: string, token: string) {
-  const res = await fetch(
-    `${process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'}/api/pressbox/conversation?id=${id}`,
-    {
-      headers: { 'Authorization': `Bearer ${token}` },
-      cache: 'no-store',
-    }
-  );
-
-  if (!res.ok) return null;
-  const data = await res.json();
-  return data.conversation;
-}
-
 export default async function ConversationPage({
   params,
 }: {
@@ -43,7 +30,9 @@ export default async function ConversationPage({
     redirect('/pressbox/login?redirect=/pressbox');
   }
 
-  const conversation = await getConversation(id, auth.token);
+  const conversation = await prisma.conversation.findFirst({
+    where: { id, userId: auth.user.id },
+  });
 
   if (!conversation) {
     redirect('/pressbox');
@@ -52,7 +41,7 @@ export default async function ConversationPage({
   return (
     <ConversationInterface
       conversationId={conversation.id}
-      initialTranscript={conversation.transcript || []}
+      initialTranscript={(conversation.transcript as any[]) || []}
       gameInfo={{
         homeTeam: conversation.homeTeam,
         awayTeam: conversation.awayTeam,

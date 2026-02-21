@@ -2,6 +2,7 @@ import { redirect } from 'next/navigation';
 import { Dashboard } from '@/components/pressbox/dashboard';
 import { cookies } from 'next/headers';
 import { getUserFromToken } from '@/lib/auth';
+import { prisma } from '@/lib/prisma';
 
 async function getAuthUser() {
   const cookieStore = await cookies();
@@ -17,28 +18,6 @@ async function getAuthUser() {
   return { user, token };
 }
 
-async function getConversations(token: string) {
-  const res = await fetch(`${process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'}/api/pressbox/conversation`, {
-    headers: { 'Authorization': `Bearer ${token}` },
-    cache: 'no-store',
-  });
-
-  if (!res.ok) return [];
-  const data = await res.json();
-  return data.conversations || [];
-}
-
-async function getArticles(token: string) {
-  const res = await fetch(`${process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'}/api/pressbox/article`, {
-    headers: { 'Authorization': `Bearer ${token}` },
-    cache: 'no-store',
-  });
-
-  if (!res.ok) return [];
-  const data = await res.json();
-  return data.articles || [];
-}
-
 export default async function PressBoxPage() {
   const auth = await getAuthUser();
 
@@ -47,9 +26,34 @@ export default async function PressBoxPage() {
   }
 
   const [conversations, articles] = await Promise.all([
-    getConversations(auth.token),
-    getArticles(auth.token),
+    prisma.conversation.findMany({
+      where: { userId: auth.user.id },
+      orderBy: { createdAt: 'desc' },
+      take: 20,
+    }),
+    prisma.article.findMany({
+      where: { userId: auth.user.id },
+      orderBy: { createdAt: 'desc' },
+      take: 20,
+      include: {
+        conversation: {
+          select: {
+            homeTeam: true,
+            awayTeam: true,
+            sport: true,
+            gameDate: true,
+          },
+        },
+      },
+    }),
   ]);
 
-  return <Dashboard conversations={conversations} articles={articles} token={auth.token} />;
+  // Serialize dates for client component compatibility
+  return (
+    <Dashboard
+      conversations={JSON.parse(JSON.stringify(conversations))}
+      articles={JSON.parse(JSON.stringify(articles))}
+      token={auth.token}
+    />
+  );
 }

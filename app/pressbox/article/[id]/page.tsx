@@ -2,6 +2,7 @@ import { redirect } from 'next/navigation';
 import { ArticleEditor } from '@/components/pressbox/article-editor';
 import { cookies } from 'next/headers';
 import { getUserFromToken } from '@/lib/auth';
+import { prisma } from '@/lib/prisma';
 
 async function getAuthUser() {
   const cookieStore = await cookies();
@@ -17,20 +18,6 @@ async function getAuthUser() {
   return { user, token };
 }
 
-async function getArticle(id: string, token: string) {
-  const res = await fetch(
-    `${process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'}/api/pressbox/article?id=${id}`,
-    {
-      headers: { 'Authorization': `Bearer ${token}` },
-      cache: 'no-store',
-    }
-  );
-
-  if (!res.ok) return null;
-  const data = await res.json();
-  return data.article;
-}
-
 export default async function ArticlePage({
   params,
 }: {
@@ -43,7 +30,10 @@ export default async function ArticlePage({
     redirect('/pressbox/login?redirect=/pressbox');
   }
 
-  const article = await getArticle(id, auth.token);
+  const article = await prisma.article.findFirst({
+    where: { id, userId: auth.user.id },
+    include: { conversation: true },
+  });
 
   if (!article) {
     redirect('/pressbox');
