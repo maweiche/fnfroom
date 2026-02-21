@@ -31,8 +31,12 @@ export async function middleware(request: NextRequest) {
   }
 
   // Also check for token in cookie (for browser-based requests)
+  // Admin login sets "auth_token", API login sets "token" — check auth_token first
+  // so admin sessions survive pressbox logins (which overwrite the "token" cookie)
   if (!token) {
-    token = request.cookies.get('auth_token')?.value || null;
+    token = request.cookies.get('auth_token')?.value
+      || request.cookies.get('token')?.value
+      || null;
   }
 
   // Verify token and get user payload

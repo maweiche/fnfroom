@@ -89,7 +89,7 @@ export async function Scoreboard() {
   if (games.length === 0) return null;
 
   return (
-    <div className="w-full bg-background/80 backdrop-blur-md border-b border-border/50">
+    <div className="w-full bg-background/80 backdrop-blur-md border-b border-border/50" data-nosnippet>
       <ScoreboardTicker games={games} />
     </div>
   );

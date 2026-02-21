@@ -35,7 +35,7 @@ export default function AdminLoginPage() {
         throw new Error("Access denied. Admin privileges required.");
       }
 
-      // Set cookie
+      // Set cookie for middleware auth
       document.cookie = `auth_token=${data.token}; path=/; max-age=${
         7 * 24 * 60 * 60
       }`;

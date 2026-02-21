@@ -97,7 +97,7 @@ export async function getConversationResponse(
   if (provider === 'gemini') {
     const genAI = getGemini();
     const model = genAI.getGenerativeModel({
-      model: 'gemini-1.5-pro',
+      model: 'gemini-2.0-flash',
       systemInstruction: systemPrompt
     });
 
@@ -139,7 +139,7 @@ export async function generateArticle(
 
   if (provider === 'gemini') {
     const genAI = getGemini();
-    const model = genAI.getGenerativeModel({ model: 'gemini-1.5-pro' });
+    const model = genAI.getGenerativeModel({ model: 'gemini-2.0-flash' });
     const result = await model.generateContent(prompt);
     articleText = result.response.text();
   } else {

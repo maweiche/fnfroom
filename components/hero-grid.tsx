@@ -91,7 +91,7 @@ export async function HeroGrid({ featuredArticles = [], featuredVideoPlaybackId 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4 w-full">
         {/* Left Column - 2 Featured Articles Stacked (2/3 width on desktop) */}
         <div className="md:col-span-2 flex flex-col gap-4">
-          {featuredArticles.slice(0, 2).reverse().map((article, index) => (
+          {featuredArticles.slice(0, 2).map((article, index) => (
             <FeaturedArticleCard
               key={article._id}
               article={article}
@@ -108,7 +108,7 @@ export async function HeroGrid({ featuredArticles = [], featuredVideoPlaybackId 
           </div>
 
           {/* Upcoming Games Table - Bottom Right (takes remaining space) */}
-          <div className="flex-1 min-h-0">
+          <div className="flex-1 min-h-0" data-nosnippet>
             <UpcomingMensGamesTable games={weeklyGames} />
           </div>
         </div>
