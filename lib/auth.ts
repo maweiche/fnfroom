@@ -160,6 +160,8 @@ export async function getUserFromToken(token: string) {
       verifiedAt: true,
       writerStyleNotes: true, // For Press Box AI
       playerId: true, // For player account linking
+      displayName: true, // For community board
+      bannedAt: true, // For community moderation
     },
   });
 

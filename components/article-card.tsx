@@ -75,7 +75,7 @@ export function ArticleCard({ article, priority = false, listView = false }: Art
       href={`/${article.sport}/${article.slug.current}`}
       className="group block"
     >
-      <article className="overflow-hidden rounded-lg bg-card shadow-card hover:shadow-card-hover transition-shadow duration-200 h-full flex flex-col">
+      <article className="min-h-[400px] overflow-hidden rounded-lg bg-card shadow-card hover:shadow-card-hover transition-shadow duration-200 h-full flex flex-col">
         {/* Featured Image */}
         <div className="relative aspect-video bg-gradient-to-br from-slate-200 to-slate-300 dark:from-slate-700 dark:to-slate-800 overflow-hidden">
           {imageUrl && (

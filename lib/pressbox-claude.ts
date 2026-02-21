@@ -51,14 +51,10 @@ export function buildInterviewPrompt(
     : '';
 
   const phaseGuidance =
-    turnCount < 5
-      ? '\n\nCURRENT PHASE: GAME IDENTIFICATION - Focus on basic details (teams, score, date, location).'
+    turnCount < 2
+      ? '\n\nCURRENT PHASE: INITIAL - Read their message carefully. Acknowledge what they provided, then ask ONLY about missing details. Skip any phase already covered.'
       : turnCount < 10
-      ? '\n\nCURRENT PHASE: NARRATIVE - Get the story of the game, turning points, momentum shifts.'
-      : turnCount < 15
-      ? '\n\nCURRENT PHASE: STANDOUT PERFORMERS - Ask about key players and their stats.'
-      : turnCount < 20
-      ? '\n\nCURRENT PHASE: CONTEXT - Atmosphere, crowd, season implications, storylines.'
+      ? '\n\nCURRENT PHASE: GAP FILLING - Only ask about details not yet covered: game flow, standout performers, key stats, context.'
       : '\n\nCURRENT PHASE: WRAP-UP - Check for missing details, corrections, ready to generate.';
 
   return basePrompt + styleNotes + phaseGuidance;

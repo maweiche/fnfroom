@@ -245,6 +245,18 @@ export function Navigation() {
                 </DropdownMenuContent> */}
               {/* </DropdownMenu> */}
 
+              {/* Community */}
+              <Link
+                href="/community"
+                className={`px-4 py-2 text-sm font-medium transition-colors duration-150 ${
+                  isActive('/community')
+                    ? 'text-primary font-semibold'
+                    : 'text-secondary hover:text-foreground'
+                }`}
+              >
+                Community
+              </Link>
+
               {/* About Dropdown */}
               <DropdownMenu>
                 <DropdownMenuTrigger className="flex items-center gap-1 px-4 py-2 text-sm font-medium text-secondary hover:text-foreground transition-colors duration-150 outline-none">
@@ -407,6 +419,24 @@ export function Navigation() {
                     );
                   })}
                 </nav> */}
+
+                {/* Community */}
+                <nav className="mb-6 pt-4 border-t border-border">
+                  <Link
+                    href="/community"
+                    onClick={() => setMenuOpen(false)}
+                    className={`group flex items-center justify-between px-4 py-2.5 rounded-lg font-medium transition-all duration-150 ${
+                      isActive('/community')
+                        ? 'bg-primary/10 text-primary'
+                        : 'hover:bg-muted/10 text-foreground'
+                    }`}
+                  >
+                    <span className="text-sm">Community</span>
+                    {isActive('/community') && (
+                      <span className="w-1.5 h-1.5 rounded-full bg-primary" />
+                    )}
+                  </Link>
+                </nav>
 
                 {/* Utility Links */}
                 <nav className="pt-4 border-t border-border">

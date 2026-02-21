@@ -181,10 +181,18 @@ model User {
   playerId String? @unique @map("player_id") @db.Uuid
   player   Player? @relation("PlayerAccount", fields: [playerId], references: [id], onDelete: SetNull)
 
+  // Community fields
+  displayName String?   @map("display_name") @db.VarChar(30)
+  bannedAt    DateTime? @map("banned_at")
+
   // Relations
-  submissions   Submission[]
-  conversations Conversation[] // Press Box AI
-  articles      Article[] // Press Box AI
+  submissions      Submission[]
+  conversations    Conversation[] // Press Box AI
+  articles         Article[] // Press Box AI
+  boardPosts       BoardPost[]  @relation("BoardPosts")
+  boardReplies     BoardReply[] @relation("BoardReplies")
+  communityThreads CommunityThread[]
+  communityReplies CommunityReply[]
 
   createdAt DateTime  @default(now()) @map("created_at")
   updatedAt DateTime  @updatedAt @map("updated_at")
@@ -471,7 +479,43 @@ model Roster {
 }
 
 // ========================================
-// MODEL 11: AdminAuditLog (Admin Action Tracking)
+// MODEL 11: BoardPost (Internal Message Board)
+// ========================================
+model BoardPost {
+  id       String @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  authorId String @map("author_id") @db.Uuid
+  author   User   @relation("BoardPosts", fields: [authorId], references: [id], onDelete: Cascade)
+  body     String @db.Text
+
+  replies   BoardReply[]
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  @@index([authorId])
+  @@index([createdAt])
+  @@map("board_posts")
+}
+
+// ========================================
+// MODEL 12: BoardReply (Message Board Replies)
+// ========================================
+model BoardReply {
+  id       String    @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  postId   String    @map("post_id") @db.Uuid
+  post     BoardPost @relation(fields: [postId], references: [id], onDelete: Cascade)
+  authorId String    @map("author_id") @db.Uuid
+  author   User      @relation("BoardReplies", fields: [authorId], references: [id], onDelete: Cascade)
+  body     String    @db.Text
+
+  createdAt DateTime @default(now()) @map("created_at")
+
+  @@index([postId, createdAt])
+  @@index([authorId])
+  @@map("board_replies")
+}
+
+// ========================================
+// MODEL 13: AdminAuditLog (Admin Action Tracking)
 // ========================================
 model AdminAuditLog {
   id          String @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
@@ -489,4 +533,79 @@ model AdminAuditLog {
   @@index([adminUserId])
   @@index([targetType, targetId])
   @@map("admin_audit_logs")
+}
+
+// ========================================
+// COMMUNITY MESSAGE BOARD MODELS
+// ========================================
+
+// ========================================
+// MODEL 14: CommunityCategory
+// ========================================
+model CommunityCategory {
+  id          String  @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  name        String  @db.VarChar(100)
+  slug        String  @unique @db.VarChar(100)
+  description String?
+  sport       String? @db.VarChar(50)
+  sortOrder   Int     @default(0) @map("sort_order")
+
+  createdAt DateTime @default(now()) @map("created_at")
+
+  threads CommunityThread[]
+
+  @@index([sortOrder])
+  @@map("community_categories")
+}
+
+// ========================================
+// MODEL 15: CommunityThread
+// ========================================
+model CommunityThread {
+  id         String  @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  title      String  @db.VarChar(200)
+  body       String  @db.Text
+  authorId   String  @map("author_id") @db.Uuid
+  author     User    @relation(fields: [authorId], references: [id], onDelete: Cascade)
+  categoryId String  @map("category_id") @db.Uuid
+  category   CommunityCategory @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+  pinned     Boolean @default(false)
+  locked     Boolean @default(false)
+  viewCount  Int     @default(0) @map("view_count")
+  postCount  Int     @default(0) @map("post_count")
+  lastPostAt DateTime? @map("last_post_at")
+  lastPostBy String?   @map("last_post_by") @db.Uuid
+
+  deletedAt DateTime? @map("deleted_at")
+  createdAt DateTime  @default(now()) @map("created_at")
+  updatedAt DateTime  @updatedAt @map("updated_at")
+
+  replies CommunityReply[]
+
+  @@index([categoryId, pinned(sort: Desc), lastPostAt(sort: Desc)])
+  @@index([authorId])
+  @@index([deletedAt])
+  @@map("community_threads")
+}
+
+// ========================================
+// MODEL 16: CommunityReply
+// ========================================
+model CommunityReply {
+  id       String @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  body     String @db.Text
+  authorId String @map("author_id") @db.Uuid
+  author   User   @relation(fields: [authorId], references: [id], onDelete: Cascade)
+  threadId String @map("thread_id") @db.Uuid
+  thread   CommunityThread @relation(fields: [threadId], references: [id], onDelete: Cascade)
+
+  editedAt  DateTime? @map("edited_at")
+  deletedAt DateTime? @map("deleted_at")
+  createdAt DateTime  @default(now()) @map("created_at")
+  updatedAt DateTime  @updatedAt @map("updated_at")
+
+  @@index([threadId, createdAt])
+  @@index([authorId])
+  @@index([deletedAt])
+  @@map("community_replies")
 }

@@ -42,7 +42,7 @@ export default async function StaffPage() {
                 href={`/staff/${member.slug.current}`}
                 className="block group"
               >
-                <article className="p-6 bg-card border border-border rounded-lg hover:shadow-card transition-shadow duration-200 text-center">
+                <article className="min-h-[275px] p-6 bg-card border border-border rounded-lg hover:shadow-card transition-shadow duration-200 text-center">
                   {/* Photo */}
                   {member.photo && (
                     <div className="relative w-24 h-24 mx-auto mb-4 rounded-full overflow-hidden">

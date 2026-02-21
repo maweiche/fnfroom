@@ -12,7 +12,8 @@ export async function middleware(request: NextRequest) {
     pathname === '/admin/login' ||
     pathname === '/pressbox/login' ||
     pathname === '/scoresnap/login' ||
-    pathname === '/player/login'
+    pathname === '/player/login' ||
+    pathname === '/board/login'
   ) {
     return NextResponse.next();
   }
@@ -114,6 +115,21 @@ export async function middleware(request: NextRequest) {
     return NextResponse.next();
   }
 
+  // ========================================
+  // BOARD ROUTES: /board/*
+  // ========================================
+  if (pathname.startsWith('/board')) {
+    if (!payload) {
+      return NextResponse.redirect(new URL('/board/login', request.url));
+    }
+
+    if (!['ADMIN', 'WRITER', 'COACH'].includes(payload.role)) {
+      return NextResponse.redirect(new URL('/', request.url));
+    }
+
+    return NextResponse.next();
+  }
+
   // All other routes are public
   return NextResponse.next();
 }
@@ -127,5 +143,6 @@ export const config = {
     '/coach/:path*',
     '/player/profile/:path*',
     '/pressbox/:path*',
+    '/board/:path*',
   ],
 };

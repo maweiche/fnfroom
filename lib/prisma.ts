@@ -76,6 +76,64 @@ export const prisma = basePrisma.$extends({
         });
       },
     },
+    communityThread: {
+      async delete({ args, query }) {
+        return query({ ...args, data: { deletedAt: new Date() } } as any);
+      },
+      async deleteMany({ args, query }) {
+        return query({
+          ...args,
+          data: { deletedAt: new Date() },
+        } as any);
+      },
+      async findUnique({ args, query }) {
+        return query({
+          ...args,
+          where: { ...args.where, deletedAt: null },
+        } as any);
+      },
+      async findFirst({ args, query }) {
+        return query({
+          ...args,
+          where: { ...args.where, deletedAt: null },
+        });
+      },
+      async findMany({ args, query }) {
+        return query({
+          ...args,
+          where: { ...args.where, deletedAt: null },
+        });
+      },
+    },
+    communityReply: {
+      async delete({ args, query }) {
+        return query({ ...args, data: { deletedAt: new Date() } } as any);
+      },
+      async deleteMany({ args, query }) {
+        return query({
+          ...args,
+          data: { deletedAt: new Date() },
+        } as any);
+      },
+      async findUnique({ args, query }) {
+        return query({
+          ...args,
+          where: { ...args.where, deletedAt: null },
+        } as any);
+      },
+      async findFirst({ args, query }) {
+        return query({
+          ...args,
+          where: { ...args.where, deletedAt: null },
+        });
+      },
+      async findMany({ args, query }) {
+        return query({
+          ...args,
+          where: { ...args.where, deletedAt: null },
+        });
+      },
+    },
   },
 });
 

@@ -14,6 +14,7 @@ import {
   GraduationCap,
   FileText,
   Upload,
+  MessageCircle,
 } from "lucide-react";
 
 interface NavItem {
@@ -78,6 +79,11 @@ const navItems: NavItem[] = [
     name: "College Offers",
     href: "/admin/offers",
     icon: GraduationCap,
+  },
+  {
+    name: "Board",
+    href: "/admin/board",
+    icon: MessageCircle,
   },
   {
     name: "Audit Log",

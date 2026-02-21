@@ -4,6 +4,7 @@ import { useState, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useAuth } from '@/lib/auth-context';
 import { Logo } from '@/components/logo';
+import Link from 'next/link';
 
 function LoginForm() {
   const router = useRouter();
@@ -126,7 +127,11 @@ function LoginForm() {
           {/* Help Text */}
           <div className="mt-6 text-center">
             <p className="text-sm text-gray-600">
-              First time? Contact your administrator for an account.
+              First time?{' '}
+              <Link href="/register" className="text-blue-600 hover:underline font-medium">
+                Create an account
+              </Link>{' '}
+              or contact your administrator.
             </p>
           </div>
         </div>

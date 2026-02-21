@@ -77,14 +77,14 @@ export default async function ArticlePage({ params }: ArticlePageProps) {
   return (
     <article className="min-h-screen">
       {/* Hero Section */}
-      <header className="relative aspect-[4/3] w-full bg-black">
+      <header className="relative aspect-[16/9] w-full bg-black">
         {imageUrl && (
           <Image
             src={imageUrl}
             alt={article.featuredImage?.alt || article.title}
             fill
             sizes="100vw"
-            className="object-contain"
+            className="object-cover"
             priority
           />
         )}

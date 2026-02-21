@@ -9,6 +9,7 @@ interface User {
   name: string;
   role: string;
   schoolName: string | null;
+  displayName: string | null;
 }
 
 interface AuthContextType {
@@ -16,6 +17,7 @@ interface AuthContextType {
   token: string | null;
   loading: boolean;
   login: (email: string, password: string) => Promise<void>;
+  register: (data: { email: string; password: string; name: string; displayName: string }) => Promise<void>;
   logout: () => void;
   updateUser: (user: User) => void;
 }
@@ -70,6 +72,26 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     localStorage.setItem('authUser', JSON.stringify(newUser));
   };
 
+  const register = async (data: { email: string; password: string; name: string; displayName: string }) => {
+    const response = await fetch('/api/auth/register', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(data),
+    });
+
+    if (!response.ok) {
+      const result = await response.json();
+      throw new Error(result.error || 'Registration failed');
+    }
+
+    const { token: newToken, user: newUser } = await response.json();
+
+    setToken(newToken);
+    setUser(newUser);
+    localStorage.setItem('authToken', newToken);
+    localStorage.setItem('authUser', JSON.stringify(newUser));
+  };
+
   const logout = () => {
     setToken(null);
     setUser(null);
@@ -84,7 +106,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   };
 
   return (
-    <AuthContext.Provider value={{ user, token, loading, login, logout, updateUser }}>
+    <AuthContext.Provider value={{ user, token, loading, login, register, logout, updateUser }}>
       {children}
     </AuthContext.Provider>
   );
